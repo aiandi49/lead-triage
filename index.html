@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-size="m">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Phoenix lead triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pad:clamp(16px,3.2vw,56px);
+  --serif:"Fraunces","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --bg:#ffffff;
+  --wash-a:#e9fbfa;
+  --wash-b:#ffffff;
+  --surface:#ffffff;
+  --surface-2:#f2fafa;
+  --ink:#0a2a35;
+  --ink-2:#3b5b66;
+  --ink-3:#557781;
+  --line:#cfe5e6;
+  --line-2:#e3f0f1;
+  --turq:#12b7bc;
+  --turq-ink:#06767c;
+  --aqua:#63d6d9;
+  --foam:#c8f1e5;
+  --foam-ink:#0b4b45;
+  --ocean:#0a4d68;
+  --ocean-ink:#ffffff;
+  --sky:#dcf0fa;
+  --sky-ink:#0a4d68;
+  --mute-bg:#e8f0f2;
+  --mute-ink:#496670;
+  --strong-bg:#12b7bc;
+  --strong-ink:#03262b;
+  --ok:#137a5a;
+  --focus:#0a7fb0;
+  --shadow:0 1px 2px rgba(6,54,75,.06),0 14px 32px -16px rgba(6,54,75,.22);
+  --shadow-sm:0 1px 2px rgba(6,54,75,.07),0 6px 16px -10px rgba(6,54,75,.2);
+  --hero:linear-gradient(160deg,#e3f8f7 0%,#f3fcfb 48%,#ffffff 100%);
+  --band:linear-gradient(90deg,#0a4d68,#0f8b9c 60%,#5fd5d3);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="dark"]{
+  --bg:#041b24;--wash-a:#07303c;--wash-b:#041b24;--surface:#082f3c;--surface-2:#0a3a49;
+  --ink:#e4f6f6;--ink-2:#a9cdd2;--ink-3:#8db3ba;--line:#155062;--line-2:#0f4351;
+  --turq-ink:#66e2e5;--foam:#0f4b45;--foam-ink:#c4f4e7;--ocean:#2aa9c9;--ocean-ink:#03222c;
+  --sky:#0f3e54;--sky-ink:#bfe6f6;--mute-bg:#123b47;--mute-ink:#a3c4cb;--strong-bg:#19b8bd;--strong-ink:#032a2f;
+  --ok:#57d6a8;--focus:#7cd3f2;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 32px -16px rgba(0,0,0,.6);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35),0 6px 16px -10px rgba(0,0,0,.55);
+  --hero:linear-gradient(160deg,#08384a 0%,#062b38 55%,#041b24 100%);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]):not([data-theme="dark"]){
+    --bg:#041b24;--wash-a:#07303c;--wash-b:#041b24;--surface:#082f3c;--surface-2:#0a3a49;
+    --ink:#e4f6f6;--ink-2:#a9cdd2;--ink-3:#8db3ba;--line:#155062;--line-2:#0f4351;
+    --turq-ink:#66e2e5;--foam:#0f4b45;--foam-ink:#c4f4e7;--ocean:#2aa9c9;--ocean-ink:#03222c;
+    --sky:#0f3e54;--sky-ink:#bfe6f6;--mute-bg:#123b47;--mute-ink:#a3c4cb;--strong-bg:#19b8bd;--strong-ink:#032a2f;
+    --ok:#57d6a8;--focus:#7cd3f2;
+    --hero:linear-gradient(160deg,#08384a 0%,#062b38 55%,#041b24 100%);
+  }
+}
+html{
+  background:var(--bg);
+  font-size:100%;
+  scroll-padding-top:env(safe-area-inset-top,0px);
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+html[data-size="s"]{font-size:90%}
+html[data-size="m"]{font-size:100%}
+html[data-size="l"]{font-size:112.5%}
+html[data-size="xl"]{font-size:125%}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:1rem;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.15;margin:0;letter-spacing:-.01em;color:var(--ink)}
+p{margin:0}
+button,select,input,textarea{font:inherit;color:inherit}
+a{color:var(--turq-ink)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* page bands: every section is full width; padding is set per side */
+.band{
+  width:100%;
+  padding-left:max(var(--pad),env(safe-area-inset-left,0px));
+  padding-right:max(var(--pad),env(safe-area-inset-right,0px));
+  padding-top:clamp(28px,5vw,56px);
+  padding-bottom:clamp(28px,5vw,56px);
+}
+.band+.band{border-top:1px solid var(--line-2)}
+
+/* masthead */
+.masthead{background:var(--hero);text-align:center;padding-top:clamp(22px,4vw,40px);padding-bottom:clamp(28px,5vw,52px)}
+.tools{display:flex;flex-wrap:wrap;gap:12px 20px;justify-content:center;align-items:center;margin-bottom:clamp(22px,4vw,40px)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow-sm)}
+.seg button{border:0;background:transparent;min-width:44px;min-height:44px;padding:0 14px;cursor:pointer;color:var(--ink-2);font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--ocean);color:var(--ocean-ink)}
+.toolbtn{min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;font-weight:600;box-shadow:var(--shadow-sm)}
+.toolgroup{display:flex;align-items:center;gap:10px;font-size:.875rem;color:var(--ink-2);font-weight:600}
+.masthead h1{font-size:clamp(2.1rem,7vw,4.6rem);max-width:none}
+.masthead .lede{margin:14px auto 0;color:var(--ink-2);font-size:clamp(1rem,1.6vw,1.2rem);max-width:60ch}
+.mh{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(20px,4vw,40px);align-items:center}
+.mh-text{min-width:0}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 12px;box-shadow:var(--shadow-sm)}
+.stat b{display:block;font-family:var(--serif);font-size:clamp(1.7rem,4vw,2.4rem);line-height:1;color:var(--ocean)}
+.stat span{display:block;margin-top:6px;color:var(--ink-2);font-size:.9rem}
+:root[data-theme="dark"] .stat b{color:var(--aqua)}
+
+/* sections */
+.section-head{text-align:center;margin-bottom:clamp(18px,3vw,32px)}
+.section-head h2{font-size:clamp(1.6rem,4vw,2.5rem)}
+.section-head p{margin:10px auto 0;color:var(--ink-2);max-width:68ch}
+
+/* top picks */
+.picks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.pick{
+  background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--turq);
+  border-radius:16px;padding:18px 18px 16px;box-shadow:var(--shadow-sm);text-align:left;
+  display:flex;flex-direction:column;gap:8px;min-width:0
+}
+.pick h3{font-size:1.2rem;overflow-wrap:anywhere}
+.pick .meta{color:var(--ink-3);font-size:.9rem}
+.pick p.why{color:var(--ink-2)}
+.pick .row-actions{margin-top:auto;padding-top:6px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--ocean);background:var(--ocean);color:var(--ocean-ink);font-weight:600;cursor:pointer;text-decoration:none;line-height:1.1;text-align:center}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.small{min-height:40px;padding:0 14px;font-size:.92rem}
+.row-actions{display:flex;flex-wrap:wrap;gap:8px}
+
+/* details form */
+.formgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;text-align:left}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-weight:600;font-size:.95rem}
+.field small{color:var(--ink-3)}
+.field input,.field textarea,.field select,.filters select,.filters input{
+  width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);
+}
+.field textarea{min-height:88px;resize:vertical}
+
+/* filters */
+.filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px;text-align:left}
+.filters .search{grid-column:1/-1}
+.filters label{display:block;font-size:.85rem;color:var(--ink-2);font-weight:600;margin-bottom:4px}
+.resultbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:center;margin:6px 0 14px;color:var(--ink-2)}
+
+/* tracker list: stacked cards on small screens, a table on wide ones */
+.tracker{margin:0;padding:0;list-style:none;display:grid;gap:14px}
+.tracker-head{display:none}
+.lead{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-sm);text-align:left;min-width:0;overflow:hidden}
+.lead-main{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:16px}
+.c{min-width:0}
+.lead-main{align-items:start}
+.c-fit{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.chip{display:inline-flex;align-items:center;min-height:26px;padding:2px 12px;border-radius:999px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.t-top{background:var(--ocean);color:var(--ocean-ink)}
+.t-strong{background:var(--strong-bg);color:var(--strong-ink)}
+.t-test{background:var(--foam);color:var(--foam-ink)}
+.t-watch{background:var(--mute-bg);color:var(--mute-ink)}
+.bars{display:inline-flex;gap:3px;align-items:center}
+.bars i{display:block;width:14px;height:6px;border-radius:3px;background:var(--line)}
+.bars i.on{background:var(--turq)}
+.lead h3{font-size:1.15rem;overflow-wrap:anywhere}
+.meta-line{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--ink-3);font-size:.9rem;margin-top:4px}
+.fresh{font-weight:700}
+.fresh.hot{color:var(--turq-ink)}
+.fresh.fresh1{color:var(--ok)}
+.fresh.aging{color:var(--ink-3)}
+.fresh.stale{color:var(--ink-3);font-weight:500}
+.why{color:var(--ink-2);overflow-wrap:anywhere}
+.note{display:block;margin-top:6px;color:var(--ink-3);font-size:.9rem}
+.lane{font-weight:600;color:var(--ink);overflow-wrap:anywhere}
+.src{display:block;color:var(--ink-3);font-size:.88rem}
+.lbl{display:block;font-size:.8rem;font-weight:700;color:var(--ink-3);margin-bottom:2px}
+.status-sel{width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.status-sel.s-sent,.status-sel.s-replied,.status-sel.s-booked{border-color:var(--turq);box-shadow:inset 0 0 0 1px var(--turq)}
+.status-sel.s-passed{opacity:.7}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+
+/* draft panel */
+.panel{border-top:1px solid var(--line-2);background:var(--surface-2);padding:16px}
+.panel[hidden]{display:none}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{min-height:40px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--ocean);border-color:var(--ocean);color:var(--ocean-ink)}
+.tabpane[hidden]{display:none}
+.panel textarea,.panel input[type="text"]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);min-height:44px}
+.panel textarea{line-height:1.5;resize:vertical}
+.panel .field+.field{margin-top:10px}
+.panel .row-actions{margin-top:10px}
+.count{color:var(--ink-3);font-size:.9rem;align-self:center}
+.tip{color:var(--ink-2);font-size:.92rem;margin-bottom:10px}
+
+/* rules and notes */
+.prose{text-align:left;color:var(--ink-2)}
+.prose ul{margin:10px 0 0;padding-left:1.2rem}
+.prose li{margin:6px 0}
+details.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0;box-shadow:var(--shadow-sm);text-align:left}
+details.card+details.card{margin-top:12px}
+details.card summary{cursor:pointer;padding:14px 18px;min-height:44px;font-family:var(--serif);font-weight:700;font-size:1.1rem}
+details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
+.setaside{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;list-style:none;margin:0;padding:0}
+.setaside li{padding:10px 0;border-top:1px solid var(--line-2)}
+.setaside li:first-child{border-top:0}
+.setaside b{color:var(--ink)}
+.foot{text-align:center;color:var(--ink-3)}
+.foot .row-actions{justify-content:center;margin-top:12px}
+.toast{min-height:1.5em;color:var(--ok);font-weight:600;text-align:center}
+.empty{padding:28px 16px;text-align:center;color:var(--ink-2);border:1px dashed var(--line);border-radius:16px}
+
+/* wider layouts */
+@media (min-width:600px) and (max-width:999px){
+  .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (min-width:600px){
+  .picks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .formgrid .wide{grid-column:1/-1}
+  .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .setaside{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+}
+@media (min-width:768px){
+  .masthead{text-align:left}
+  .masthead .lede{margin-left:0}
+  .tools{justify-content:flex-end}
+  .section-head{text-align:left}
+  .section-head p{margin-left:0}
+  .resultbar{justify-content:space-between}
+  .foot{text-align:left}
+  .foot .row-actions{justify-content:flex-start}
+  .toast{text-align:left}
+}
+@media (min-width:1000px){
+  .mh{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+}
+@media (min-width:700px) and (max-width:1179px){
+  .lead-main{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);column-gap:28px;row-gap:12px}
+  .lead-main>.c:nth-child(1){grid-column:1;grid-row:1}
+  .lead-main>.c:nth-child(2){grid-column:1;grid-row:2}
+  .lead-main>.c:nth-child(3){grid-column:1;grid-row:3}
+  .lead-main>.c:nth-child(4){grid-column:2;grid-row:1}
+  .lead-main>.c:nth-child(5){grid-column:2;grid-row:2}
+  .lead-main>.c:nth-child(6){grid-column:2;grid-row:3}
+}
+@media (min-width:1180px){
+  .filters{grid-template-columns:2fr repeat(5,1fr)}
+  .filters .search{grid-column:auto}
+  #sortwrap{display:none}
+  .tablewrap{border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);background:var(--surface)}
+  .tracker{gap:0}
+  .tracker-head,.lead-main{
+    display:grid;
+    grid-template-columns:7rem minmax(0,1.4fr) minmax(0,1.6fr) minmax(0,.8fr) 10.5rem 8.5rem;
+    column-gap:18px;align-items:start;
+  }
+  .tracker-head{
+    padding:12px 18px;background:var(--surface-2);border-bottom:1px solid var(--line);
+    font-weight:700;font-size:.88rem;color:var(--ink-2);text-align:left;
+  }
+  .tracker-head>div{display:flex;align-items:center;min-height:32px}
+  .tracker-head button{all:unset;cursor:pointer;display:inline-flex;gap:6px;align-items:center;min-height:32px;font-weight:700;color:var(--ink-2)}
+  .tracker-head button:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+  .tracker-head button[aria-sort="ascending"]::after{content:"\25B2";font-size:.65rem}
+  .tracker-head button[aria-sort="descending"]::after{content:"\25BC";font-size:.65rem}
+  .lead{border:0;border-radius:0;box-shadow:none;border-top:1px solid var(--line-2)}
+  .lead-main{padding:16px 18px}
+  .lead-main>.c{grid-column:auto;grid-row:auto}
+  .lbl{display:none}
+  .c-fit{flex-direction:column;align-items:flex-start;gap:8px}
+  .acts{flex-direction:column;align-items:stretch}
+  .acts .btn{width:100%}
+}
+@media (min-width:1200px){
+  .picks{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (min-width:1800px){
+  .picks{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@supports (backdrop-filter:blur(4px)){
+  .seg,.toolbtn{backdrop-filter:blur(6px)}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="band masthead">
+  <div class="tools" role="group" aria-label="Page settings">
+    <div class="toolgroup"><span id="sizeLabel">Text size</span>
+      <div class="seg" role="group" aria-labelledby="sizeLabel">
+        <button type="button" data-size="s" aria-pressed="false" aria-label="Small text">S</button>
+        <button type="button" data-size="m" aria-pressed="true" aria-label="Medium text">M</button>
+        <button type="button" data-size="l" aria-pressed="false" aria-label="Large text">L</button>
+        <button type="button" data-size="xl" aria-pressed="false" aria-label="Extra large text">XL</button>
+      </div>
+    </div>
+    <button type="button" class="toolbtn" id="themeBtn" aria-pressed="false">Switch to dark</button>
+  </div>
+  <div class="mh">
+    <div class="mh-text">
+      <h1>Phoenix lead triage</h1>
+      <p class="lede">Trade and service businesses that posted on Craigslist Phoenix, ranked by how well your quote tool fits them. Every entry comes from a title in your screenshots. Open the post before you send anything.</p>
+    </div>
+    <div class="stats" id="stats" aria-live="polite"></div>
+  </div>
+</header>
+
+<section class="band" aria-labelledby="picksH">
+  <div class="section-head">
+    <h2 id="picksH">Where I would start</h2>
+    <p>These twelve combine a clear quoting need, a business that looks small and local, and a recent post. The estimator posts come first because the seat has been open for weeks.</p>
+  </div>
+  <ul class="picks" id="picks"></ul>
+</section>
+
+<section class="band" aria-labelledby="detH">
+  <div class="section-head">
+    <h2 id="detH">Your details for the drafts</h2>
+    <p>Fill these in once. Every draft below updates as you type. They stay in this browser only.</p>
+  </div>
+  <div class="formgrid">
+    <div class="field"><label for="f-name">Your name</label><input id="f-name" type="text" autocomplete="off"></div>
+    <div class="field"><label for="f-company">Business name (optional)</label><input id="f-company" type="text" autocomplete="off"></div>
+    <div class="field"><label for="f-phone">Phone (optional)</label><input id="f-phone" type="text" inputmode="tel" autocomplete="off"></div>
+    <div class="field"><label for="f-demo">Demo link (optional)</label><input id="f-demo" type="text" inputmode="url" autocomplete="off" placeholder="https://"></div>
+    <div class="field wide"><label for="f-quote">What your quote tool does, in one sentence</label>
+      <textarea id="f-quote"></textarea>
+      <small>I have not seen the quote tool, so this sentence is a placeholder. Rewrite it to say exactly what it does. It follows the words "I built" in each draft.</small></div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="listH">
+  <div class="section-head">
+    <h2 id="listH">All leads</h2>
+    <p>Sort, filter, copy a draft, and track what you sent. Statuses and notes are saved in this browser.</p>
+  </div>
+
+  <div class="filters" role="search">
+    <div class="search"><label for="q">Search</label><input id="q" type="search" placeholder="Title, area, trade, reason"></div>
+    <div><label for="fTier">Priority</label><select id="fTier"></select></div>
+    <div><label for="fLane">Type of business</label><select id="fLane"></select></div>
+    <div><label for="fSrc">Board</label><select id="fSrc"></select></div>
+    <div><label for="fAge">Posted</label><select id="fAge"></select></div>
+    <div><label for="fStatus">Status</label><select id="fStatus"></select></div>
+    <div id="sortwrap"><label for="sortSel">Sort by</label><select id="sortSel"></select></div>
+  </div>
+  <div class="resultbar"><span id="count"></span><button type="button" class="btn ghost small" id="clearBtn">Clear filters</button></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div role="table" class="tablewrap" aria-label="Phoenix leads">
+    <div class="tracker-head" role="row">
+      <div role="columnheader"><button type="button" data-sort="fit">Fit</button></div>
+      <div role="columnheader"><button type="button" data-sort="posted">Lead and posted date</button></div>
+      <div role="columnheader">Why it fits</div>
+      <div role="columnheader"><button type="button" data-sort="lane">Type of business</button></div>
+      <div role="columnheader"><button type="button" data-sort="status">Status</button></div>
+      <div role="columnheader">Actions</div>
+    </div>
+    <ul class="tracker" id="tracker" role="rowgroup"></ul>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="rulesH">
+  <div class="section-head"><h2 id="rulesH">Before you send</h2></div>
+  <details class="card" open>
+    <summary>How to send these without breaking Craigslist's rules</summary>
+    <div class="inner prose">
+      <ul>
+        <li>Send from the post's own reply button, or the contact method the post gives. Text only if the post invites texts.</li>
+        <li>One message per post. Follow up only if they answer.</li>
+        <li>Tie the message to what the post says. The drafts say plainly that you are offering a tool, not applying for the job.</li>
+        <li>Craigslist's terms (last updated August 16, 2019; I read the live page on September 20, 2026) ban unsolicited communications. They set $25 for each unsolicited email sent to an address obtained from Craigslist, and $500 for each unsolicited text or call made using Craigslist user information.</li>
+        <li>I cannot tell you how Craigslist would treat any single message, and I am not a lawyer. Marketing texts to cell phones may also fall under separate consumer-protection rules, which I have not researched.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="card">
+    <summary>What I set aside, and why</summary>
+    <div class="inner">
+      <ul class="setaside">
+        <li><b>Focus groups, surveys, research studies.</b> Roughly a quarter of the gig titles. People selling their time, not businesses buying tools.</li>
+        <li><b>Casting, models, actors, performers.</b> Roughly a fifth of the gig titles.</li>
+        <li><b>Commission-only and "earn $X a week" pitches.</b> Includes the repeated "Entry Level Trading Analyst" posts. These recruit sellers; they do not buy.</li>
+        <li><b>Donor and surrogacy recruiting.</b> Not a fit and not something to pitch.</li>
+        <li><b>National firms and staffing agencies.</b> Valet Living, Safeguard Properties, Solid Personnel, Southwest Contractor Staffing. A Craigslist reply is unlikely to reach a buyer.</li>
+        <li><b>Lead-generation and platform recruiters.</b> Lawn-care "pros" posts, the 813-number plumber and electrician post, the Rentatech handyman posts. They look like platforms, though I did not verify that.</li>
+        <li><b>Homeowner requests.</b> Titles like "Looking for Roofer 85260" and "Fix leaky hose bib" read as customers, not trade businesses.</li>
+        <li><b>Bid invitations.</b> "Invitation to bid, HOA perimeter" and "Seeking bids for sanding" are the buyer side. The contractors who answer are your audience, but you cannot reach them from here.</li>
+        <li><b>Content, writing, and social media gigs.</b> Left out on purpose: the tracker only lists software pain you can fix remotely.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<footer class="band foot">
+  <p>Screenshots were taken September 18 to 20, 2026, and cover part-time and contract jobs plus paid gigs. Full-time jobs and several job categories were not captured. Titles only; the post bodies are unread. The "Find post" links run an ordinary Craigslist search by title, and I could not test them from my workspace.</p>
+  <div class="row-actions">
+    <button type="button" class="btn ghost small" id="exportBtn">Download CSV</button>
+    <button type="button" class="btn ghost small" id="resetBtn">Reset statuses and notes</button>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- data ---------- */
+/* fields: title, source, area, posted (M/D, 2026), lane, tier, fit(1-5), kind, trade, why, extras */
+var LEADS=[
+ /* estimating and web */
+ ["Commercial Construction Estimator - $1\u2026","Gigs \u00b7 Labor","central/south phx","9/10","Estimating","top",5,"est","commercial construction estimator","The same title was posted 9/3, 9/8 and 9/10, so the seat is still open. Estimating is the job your quote tool does.",{note:"Might be the same firm as the Flooring Estimator post."}],
+ ["Flooring Estimator","Gigs \u00b7 Labor","central/south phx","9/10","Estimating","top",5,"est","flooring estimator","Also posted 9/3, 9/8 and 9/10. Flooring is priced from measurements, which is where quoting eats time."],
+ ["Contractor Website $700","Gigs \u00b7 Labor","Phoenix","9/14","Websites","strong",4,"web","","Either a contractor wants a site, or a web developer is advertising to contractors. Open it to see which; both tell you something.",{note:"If it is a developer's ad, the $700 is a price reference."}],
+ /* roofing */
+ ["SUBCONTRACTOR SHINGLE/TILE R\u2026","Jobs \u00b7 Skilled trades","Scottsdale","9/19","Roofing","top",4,"crew","shingle and tile roofing subcontractors","A roofing company paying crews by the square, so it already prices by the square. Your archived list view shows it as Sunset Valleywide Roofing Inc."],
+ ["Roofers needed for Valleywide work","Jobs \u00b7 Skilled trades","Phoenix","9/13","Roofing","strong",4,"crew","roofers","A roofing outfit hiring across the valley. Roofing jobs are quoted one at a time.",{note:"Same title also posted 9/2."}],
+ ["ROOFING SUBCONTRACTORS WANT\u2026","Jobs \u00b7 General labor","phx north","9/13","Roofing","strong",4,"crew","roofing subcontractors","Another roofing company recruiting subcontractors."],
+ ["Hiring LICENSED roofing subcontractors","Jobs \u00b7 Skilled trades","Mesa","9/10","Roofing","strong",4,"crew","licensed roofing subcontractors","Licensed roofing company building out subcontract capacity."],
+ ["Looking For Experienced Tile Roofer - c\u2026","Gigs \u00b7 Labor","phx north","9/4","Roofing","test",3,"crew","an experienced tile roofer","Tile roofing company looking for a roofer. Title is cut off, so check the post."],
+ ["CR-42 Roofing Qualifying Party / Operat\u2026","Gigs \u00b7 Labor","Mesa","9/3","Roofing","test",3,"crew","a roofing qualifying party","A roofing company hunting for a licensed qualifier. Open it to see how big the company is."],
+ ["Experienced Roofer / Roofing Contract\u2026","Jobs \u00b7 Skilled trades","west valley","8/26","Roofing","watch",2,"crew","an experienced roofer","Older post. Useful mainly if the same company posts again."],
+ /* hvac, plumbing, electrical */
+ ["Plumber Needed - Overflow Work (Phoe\u2026","Gigs \u00b7 Labor","Phoenix","9/17","HVAC, plumbing, electrical","top",4,"crew","a plumber for overflow work","\u201cOverflow work\u201d suggests more jobs than the crew can handle. Quoting is often the next thing to back up."],
+ ["Hiring ASAP plumber & handymen","Gigs \u00b7 Labor","surrounding area","9/19","HVAC, plumbing, electrical","top",4,"crew","plumbers and handymen","Near-identical posts since 8/20 for plumbers, handymen and commercial handymen, all with the same tool-belt image. A company that has been hiring for a month.",{note:"Probably one poster. Starting pay was shown as $30 in your list view."}],
+ ["ASAP WORK: HVAC REMODEL ELECT\u2026","Gigs \u00b7 Labor","\u201cPV guaranteed ongoing\u2026\u201d (as listed)","9/19","HVAC, plumbing, electrical","strong",4,"crew","HVAC, remodel and electrical help","Ongoing remodel and HVAC work, posted as urgent. Remodel work starts with a quote."],
+ ["Need plumbing help","Gigs \u00b7 Labor","east valley","9/18","HVAC, plumbing, electrical","strong",3,"crew","plumbing help","The image shows a plumbing van and crew, so it looks like a company rather than a homeowner."],
+ ["LICENSED PLUMBER NEEDED!! PHO\u2026 / LICENSED HVAC TECH NEEDED!! PH\u2026","Gigs \u00b7 Labor","central/south phx","9/13","HVAC, plumbing, electrical","strong",4,"crew","a licensed plumber and HVAC tech","Two posts, same company logo, both for licensed techs. A service company that is growing."],
+ ["Licensed HVAC Contractor \u2013 Install Appr\u2026","Gigs \u00b7 Labor","South Phoenix","9/15","HVAC, plumbing, electrical","strong",3,"crew","a licensed HVAC contractor","Install work being handed to a contractor. Installs are quoted job by job."],
+ ["HVAC Professional Need","Gigs \u00b7 Labor","South Phoenix","9/12","HVAC, plumbing, electrical","test",3,"crew","an HVAC professional","Small HVAC outfit or a property owner. Check the post.",{note:"A similar \u201cNeed a HVAC Professional\u201d post appeared 9/6 in Phoenix."}],
+ ["HVAC Tech needed for commercial build\u2026","Gigs \u00b7 Labor","Mesa","9/4","HVAC, plumbing, electrical","test",3,"crew","an HVAC tech for commercial buildings","Commercial HVAC company adding a tech."],
+ ["Experienced Journeyman Electricians / \u2026","Jobs \u00b7 Skilled trades","Central Arizona","9/13","HVAC, plumbing, electrical","strong",3,"crew","journeyman electricians","Electrical contractor hiring journeymen. Title is cut off."],
+ ["ELECTRICIANS NEEDED ASAP! *SA\u2026","Jobs \u00b7 Skilled trades","Phoenix","9/3","HVAC, plumbing, electrical","test",3,"crew","electricians","Urgent electrician hiring. Title is cut off."],
+ ["Electrical Helper","Gigs \u00b7 Labor","central/south phx","9/10","HVAC, plumbing, electrical","test",2,"crew","an electrical helper","Small electrical outfit, but the post says little."],
+ ["LOW VOLTAGE INSTALLATION & SE\u2026","Jobs \u00b7 Skilled trades","Valleywide","8/31","HVAC, plumbing, electrical","test",3,"crew","low voltage installers","Low-voltage installers price projects by the drop. Aging post."],
+ ["Low Voltage Technician","Jobs \u00b7 Skilled trades","Phoenix","8/30","HVAC, plumbing, electrical","test",3,"crew","a low voltage technician","May be the same company as the post above."],
+ ["Low Voltage Sales & Systems Design S\u2026","Gigs \u00b7 Labor","Tempe","8/21","HVAC, plumbing, electrical","watch",3,"crew","low voltage sales and systems design","Has a sales and design side, which means quotes. Older post."],
+ ["Experienced Mini-Split Installer \u2013 $38\u2013\u2026","Jobs \u00b7 Skilled trades","Mesa","8/25","HVAC, plumbing, electrical","test",3,"crew","a mini-split installer","Mini-split installs are quoted per unit and per run."],
+ ["Need Licensed Tradesmen ASAP","Jobs \u00b7 Skilled trades","Phoenix","9/11","HVAC, plumbing, electrical","test",3,"crew","licensed tradesmen","A contractor short on licensed hands."],
+ ["Full time Solar Installer Helper Needed","Gigs \u00b7 Labor","Peoria","9/12","HVAC, plumbing, electrical","test",3,"crew","a solar installer helper","Solar installers quote every roof differently."],
+ /* flooring and finishes */
+ ["CARPET CREWS WANTED!!!","Jobs \u00b7 Skilled trades","Phoenix, AZ","9/19","Flooring & finishes","strong",4,"crew","carpet crews","The flyer asks for experienced carpet subcontractors. Carpet jobs are priced by the room and the square foot."],
+ ["EPOXY INSTALLER or TRAINEE POSITION","Gigs \u00b7 Labor","Phoenix","9/13","Flooring & finishes","strong",3,"crew","an epoxy installer","Epoxy floors are quoted by the square foot. Posted twice in a week.",{note:"Also posted 9/10."}],
+ ["Loose Lay Vinyl Floor Installation","Gigs \u00b7 Labor","Peoria","9/15","Flooring & finishes","test",3,"crew","vinyl floor installation","Could be a business or a homeowner. Open it to check."],
+ ["Carpet installer/Carpet repair/restretch","Gigs \u00b7 Labor","Phoenix","9/8","Flooring & finishes","test",3,"crew","a carpet installer","Carpet company, small by the sound of it.",{note:"\u201cCarpet installer helper\u201d on 9/12 may be the same poster."}],
+ ["Carpet installer helper","Gigs \u00b7 Labor","Phoenix","9/12","Flooring & finishes","test",2,"crew","a carpet installer helper","See the carpet post above."],
+ ["CONTRATISTAS DE PINTURA CON EX\u2026","Jobs \u00b7 General labor","east valley","9/2","Flooring & finishes","test",3,"crew","painting contractors","Painting company recruiting contractors. The post is in Spanish.",{note:"Written in Spanish (J&J Desert Coatings logo). Reply in Spanish, or skip it if that is not comfortable."}],
+ ["Need help with waterproofing/ epoxy","Gigs \u00b7 Labor","Gilbert","9/14","Flooring & finishes","test",2,"crew","waterproofing and epoxy help","Could be a homeowner or a small contractor. Check."],
+ ["Building painter needed \u2013 Casa Grande","Jobs \u00b7 General labor","Casa Grande","8/30","Flooring & finishes","watch",2,"crew","a building painter","Older post."],
+ ["NEED A DRYWALL GUY ALSO A PAINT\u2026","Gigs \u00b7 Labor","central/south phx","8/30","Flooring & finishes","watch",2,"crew","drywall and painting help","Older post."],
+ /* masonry, framing, remodel */
+ ["Remodeling, Repairs Home","Jobs \u00b7 General labor","Peoria","9/16","Masonry, framing, remodel","top",4,"crew","remodeling help","Posted with its own business card (M'S NEW IMAGE LLC), so it looks owner-run. Every remodel starts with a quote."],
+ ["Mason - High-End Custom Residential B\u2026","Gigs \u00b7 Labor","central/south phx","9/15","Masonry, framing, remodel","strong",4,"crew","masons","Five posts in two weeks. High-end custom work means one-off quotes.",{note:"Also posted 9/3, 9/4, 9/8 and 9/10."}],
+ ["FRAMING CREW NEEDED ASAP\u2026","Gigs \u00b7 Labor","Chandler","9/17","Masonry, framing, remodel","strong",3,"crew","a framing crew","Urgent framing work. Framing is usually bid per job."],
+ ["All trades needed for busy remodeling c\u2026","Gigs \u00b7 Labor","Phoenix","9/1","Masonry, framing, remodel","strong",4,"crew","remodeling trades","A remodeling company calling itself busy. Nearly three weeks old, so move fast or skip."],
+ ["GC needs Tradesmen.","Gigs \u00b7 Labor","phx north","9/8","Masonry, framing, remodel","test",3,"crew","tradesmen for a general contractor","A general contractor short on trades."],
+ ["Renovation Project Manager / Coordin\u2026","Jobs \u00b7 Skilled trades","Arcadia","8/31","Masonry, framing, remodel","test",3,"crew","a renovation project manager","Renovation company with coordination pain. Aging post."],
+ ["Established Stucco Crews / Subcontract\u2026","Gigs \u00b7 Labor","Phoenix Metro","9/1","Masonry, framing, remodel","test",3,"crew","stucco crews","Stucco is priced by the square foot."],
+ ["Lead Handyman / Storage & Cabinet Ins\u2026","Gigs \u00b7 Labor","Phoenix Metro / East Valley","9/12","Masonry, framing, remodel","test",3,"crew","a lead handyman for storage and cabinet installs","Install company with a quoting step for every job."],
+ ["Building Insulation Installers","Jobs \u00b7 Skilled trades","central/south phx","9/9","Masonry, framing, remodel","test",3,"crew","insulation installers","Insulation jobs are quoted by area."],
+ ["Framers needed","Jobs \u00b7 Skilled trades","central/south phx","8/26","Masonry, framing, remodel","watch",2,"crew","framers","Older post."],
+ ["Looking for subcontractors or GC","Gigs \u00b7 Labor","Gold Canyon","8/28","Masonry, framing, remodel","watch",2,"crew","subcontractors or a general contractor","Older post."],
+ /* landscape and tree */
+ ["Landscaper","Jobs \u00b7 General labor","Surprise","9/16","Landscape & tree","test",3,"route","a landscaper","Landscaping jobs are quoted by the yard."],
+ ["Looking for an experienced landscaper","Gigs \u00b7 Labor","west valley","9/19","Landscape & tree","test",3,"route","an experienced landscaper","Might be a homeowner. Check first."],
+ ["EXPERIENCED LANDSCAPER NEEDE\u2026","Gigs \u00b7 Labor","west valley","9/16","Landscape & tree","test",3,"route","an experienced landscaper","Landscaping company adding a hand."],
+ ["YARD care and HANDYMAN needed","Gigs \u00b7 Labor","Phoenix area","9/16","Landscape & tree","test",3,"route","yard care and handyman help","Small yard and repair outfit."],
+ ["part time Driver! yard services/landscapi\u2026","Jobs \u00b7 General labor","mesa","9/17","Landscape & tree","test",3,"route","a driver for yard services","Yard services company."],
+ ["Tree Trimmer: Palm trees and other trees","Gigs \u00b7 Labor","Tatum and Shea","9/6","Landscape & tree","test",3,"route","a tree trimmer","Tree work is quoted tree by tree."],
+ ["Tree service hiring climbers and ground\u2026","Gigs \u00b7 Labor","east valley","9/5","Landscape & tree","test",4,"route","tree climbers and ground crew","Tree service. Every job is quoted on site."],
+ ["Foreclosure Handyman and Landscaping","Gigs \u00b7 Labor","Mesa","9/11","Landscape & tree","test",3,"route","foreclosure handyman and landscaping help","Property-cleanout work, quoted per property."],
+ /* cleaning, pools, pest */
+ ["Janitorial Subcontractors Needed - Maric\u2026","Jobs \u00b7 General labor","Gilbert","9/18","Cleaning, pools, pest","top",4,"route","janitorial subcontractors","Janitorial contracts are usually bid by square footage and visits per week."],
+ ["Pest Control","Jobs \u00b7 General labor","Phoenix","9/17","Cleaning, pools, pest","top",4,"route","pest control help","Posted with its own image, so it looks like a small company. Pest jobs are priced per property."],
+ ["Swimming Pool service tech /route person","Jobs \u00b7 General labor","Tempe / Mesa / Chandler / Gilbert","9/19","Cleaning, pools, pest","top",4,"route","a pool service tech","A pool route business. Route customers and repair jobs both need quotes."],
+ ["SWIMMING POOL REPAIR TECH","Jobs \u00b7 Skilled trades","Valleywide","9/16","Cleaning, pools, pest","strong",4,"route","a pool repair tech","Repair work is quoted one job at a time."],
+ ["Commercial Cleaning Subcontractors W\u2026","Gigs \u00b7 Labor and Domestic","west valley","9/15","Cleaning, pools, pest","strong",4,"route","commercial cleaning subcontractors","Commercial cleaning is bid by space and schedule.",{note:"DBS Building Solutions logo. Also posted 9/1."}],
+ ["EXPERIENCED RESIDENTIAL CLEAN\u2026","Gigs \u00b7 Domestic","Mesa / Gilbert","9/14","Cleaning, pools, pest","strong",4,"route","residential cleaners","Residential cleaners quote by home size.",{note:"The Cleaners at Red Mountain. Also posted 9/11."}],
+ ["Part-Time Window Cleaning Technician \u2013\u2026","Jobs \u00b7 General labor","east valley","9/13","Cleaning, pools, pest","strong",4,"route","a window cleaning technician","Has its own website in the image. Window cleaning is priced by the pane or the house."],
+ ["Pressure Washing","Gigs \u00b7 Labor","All over Valley","9/17","Cleaning, pools, pest","strong",4,"route","pressure washing help","Pressure washing is quoted by surface area.",{note:"The same \u201cQuality Finish\u201d image is on \u201cLooking for a Tile guy\u201d (9/16)."}],
+ ["Cleaning Crew needed","Gigs \u00b7 Domestic","phx north","9/14","Cleaning, pools, pest","test",3,"route","a cleaning crew","Small cleaning company."],
+ ["Cleaners - Good Wage and Benefits","Jobs \u00b7 General labor","Litchfield","9/16","Cleaning, pools, pest","test",3,"route","cleaners","Cleaning company hiring."],
+ ["Hiring experienced cleaners daily pay $2\u2026","Gigs \u00b7 Domestic","PHX & surrounding","9/17","Cleaning, pools, pest","test",3,"route","experienced cleaners","Cleaning company hiring."],
+ ["P/T BBQ Cleaning Tech Wanted $30.00\u2026","Gigs \u00b7 Labor","Chandler","8/26","Cleaning, pools, pest","test",3,"route","a BBQ cleaning tech","Priced per grill. Aging post."],
+ ["Fountain Tech - Cleaning & Repairs","Gigs \u00b7 Labor","Phoenix","9/1","Cleaning, pools, pest","test",3,"route","a fountain tech","Repairs and cleaning, quoted per job."],
+ ["Help Wanted Hand Car Washer and Det\u2026","Jobs \u00b7 General labor","Anthem","9/9","Cleaning, pools, pest","watch",2,"route","a hand car washer and detailer","Detailing has package pricing. Low priority."],
+ /* specialty install */
+ ["Permanent light installers wanted ($45-$6\u2026","Jobs \u00b7 General labor","Phoenix","9/12","Specialty install","top",4,"crew","permanent light installers","Permanent lighting is usually priced by the linear foot of roofline, a clean fit for a quote tool."],
+ ["Locksmith No Experience Needed","Jobs \u00b7 Skilled trades","Glendale","9/9","Specialty install","test",3,"crew","locksmiths","Budget Locksmith & Lockouts logo. Locksmiths quote by phone before rolling a truck."],
+ ["Espresso Machine Technician For Priv\u2026","Jobs \u00b7 Skilled trades","Carefree","9/3","Specialty install","watch",2,"crew","an espresso machine technician","Niche service. Low priority."],
+ /* moving and hauling */
+ ["MOVING COMPANY HIRING EVE\u2026","Gigs \u00b7 Labor","east valley","9/14","Moving & hauling","strong",3,"crew","movers","Moving companies quote by hours and size.",{note:"Similar titles appear 9/10 and 9/4."}],
+ ["NOW HIRING | Caddy Moving \u2014 Join\u2026","Gigs \u00b7 Labor","Phoenix, AZ","9/14","Moving & hauling","test",3,"crew","movers","Caddy Moving posts repeatedly (8/26 as well). Check whether it is a real company or a network."],
+ ["Hiring movers in your area, Apply today.","Gigs \u00b7 Labor","Phoenix","9/8","Moving & hauling","test",3,"crew","movers","Moving company hiring."],
+ ["Junk Removal Helper","Gigs \u00b7 Labor","west valley","9/7","Moving & hauling","test",3,"crew","a junk removal helper","Junk removal is quoted by the load."],
+ /* handyman and property */
+ ["handyman needed asap.","Gigs \u00b7 Labor","phoenix","9/13","Handyman & property","strong",3,"crew","handymen","A handyman company with a graphic that reads \u201cEast and West Valley Service.\u201d",{note:"Similar posts with the same graphic on 9/10 and 9/12."}],
+ ["handyman needed with own and tools a\u2026","Gigs \u00b7 Labor","phoenix","9/5","Handyman & property","test",3,"crew","handymen","Reposted at least four times, so they keep needing hands.",{note:"Also posted 8/30, 9/1 and 9/3."}],
+ ["Property Inspector and Maintenance ne\u2026","Gigs \u00b7 Labor","central/south phx","9/18","Handyman & property","test",3,"crew","a property inspector and maintenance help","Property-service company."],
+ ["need clean handyman with tools and an\u2026","Gigs \u00b7 Labor","Gilbert","9/18","Handyman & property","test",2,"crew","a handyman","Could be one person, not a business."],
+ ["Part-Time Rental Property Maintenance /\u2026","Jobs \u00b7 General labor","East Valley","8/28","Handyman & property","test",3,"crew","rental property maintenance help","Express Companies, LLC flyer. Aging post."],
+ ["Manager-Maintenance Team","Jobs \u00b7 Business","Phoenix","9/2","Handyman & property","watch",2,"crew","a maintenance team manager","Post says little from the title."],
+ ["Handyman / Maintenance Technician\u2026","Jobs \u00b7 General labor","central/south phx","8/30","Handyman & property","watch",2,"crew","a maintenance technician","Older post."],
+ /* office and front desk */
+ ["Email multiple recipients sent individually in outlook","Gigs \u00b7 Computer","Gilbert","9/17","Office & front desk","top",5,"custom","","Also posted 8/20, so nobody has solved it. It is a small, defined software fix you can build and deliver remotely.",{hook:"Reading your post, this sounds like a mail-merge problem. I can build a small tool that sends one message to a list as individual emails, each addressed to the person, so it is one click instead of a repetitive task.",ask:"Is this a one-time list, or something you send on a regular basis?"}],
+ ["Receptionist Desert Wind Shutters & \u2026","Jobs \u00b7 Admin/office","Tucson","9/19","Office & front desk","top",5,"crew","a receptionist","Custom shutters and blinds are priced job by job, and they are hiring front-desk help. It is also in Tucson, your home turf.",{hook:"Shutters and blinds are usually priced job by job, so I thought this might be relevant."}],
+ ["ACCOUNTING/OFFICE **PART TIME**","Jobs \u00b7 Admin/office","not shown","9/17","Office & front desk","strong",3,"custom","","Posted in more than one category. Part-time back-office help often means invoicing and data entry a tool could take over.",{hook:"Part-time office help often covers invoicing, data entry and follow-ups, and a small tool can handle a lot of that.",ask:"Which task takes the most time in that role today?"}],
+ ["Customer Service & Appointment S\u2026","Jobs \u00b7 Customer service","28th St & Indian School","9/9","Office & front desk","strong",3,"custom","","Appointment setting is a booking and reminder problem, which software solves well.",{hook:"Appointment setting is often a booking and reminder problem, and a small tool can handle much of it.",ask:"How do customers book with you today?"}],
+ ["Sales and Packing Assistant","Jobs \u00b7 Admin/office","Tempe","9/16","Office & front desk","test",3,"custom","","Order handling and packing lists are automatable. Small e-commerce or wholesale outfit by the sound of it.",{hook:"Order handling and packing lists are often something a small tool can do for you.",ask:"How do orders reach you now?"}],
+ ["General Administrative & Operations \u2026","Jobs \u00b7 Admin/office","Gilbert","9/15","Office & front desk","test",3,"custom","","Broad admin role. Open it to see which parts repeat.",{hook:"Admin and operations roles often have a few repeating tasks a small tool can take over.",ask:"What repeats most in that role?"}],
+ ["8 Hours a Week - Long Term, Office A\u2026","Jobs \u00b7 Admin/office","Mesa (Dr / Baseline)","9/16","Office & front desk","test",3,"custom","","Eight hours a week is a small task that keeps coming back, which is the shape a tool fits.",{hook:"Eight hours a week of steady office work is usually a few repeating tasks, and a small tool can take over some of them.",ask:"What are the main tasks in those eight hours?"}],
+ ["Bilingual Legal Document Preparation","Jobs \u00b7 Admin/office","West Phoenix","9/11","Office & front desk","test",3,"custom","","Document preparation is templated work a tool can speed up.",{hook:"Document preparation is often templated work, and a small tool can fill and assemble forms for you.",ask:"Which documents do you prepare most often?"}],
+ ["Billing/Claims (DDD) Specialist Needed","Jobs \u00b7 Admin/office","Tucson","9/8","Office & front desk","test",3,"custom","","Billing and claims work is repetitive. It is probably health-related data, so handle it with care.",{hook:"Billing and claims work often has repeating steps a small tool can cover.",ask:"Which step in billing takes the most time?",note:"Title only. DDD is probably Arizona's disability services division; I have not confirmed that."}],
+ ["Dispatcher/Receptionists","Jobs \u00b7 Admin/office","Mesa","8/28","Office & front desk","test",3,"custom","","Dispatching is scheduling, which software handles well. Aging post.",{hook:"Dispatching is a scheduling problem, and a small tool can take a lot of it off someone's desk.",ask:"How do you schedule jobs today?"}],
+ ["CUSTOMER SERVICE ORDER TAKE\u2026","Jobs \u00b7 Customer service","east valley","9/18","Office & front desk","test",3,"custom","","Taking orders by phone is a form and a queue in software terms.",{hook:"Taking orders by phone can often be replaced with a simple order form and a queue.",ask:"How do orders come in today?"}],
+ ["Data Entry- Bookeeping Experience- Office organization","Gigs \u00b7 Computer","Glendale","8/27","Office & front desk","watch",3,"custom","","Data entry is the classic automatable task. Nearly four weeks old.",{hook:"Data entry is often something a small tool can do faster and with fewer mistakes.",ask:"Where does the data come from, and where does it need to go?"}],
+ ["Bilingual Front Desk Assistant For Chi\u2026","Jobs \u00b7 Admin/office","Phoenix","8/31","Office & front desk","watch",3,"custom","","Chiropractic front desk: booking and reminders. Aging post.",{hook:"Front-desk work at a clinic often centers on booking and reminders, which a small tool can handle.",ask:"How do patients book with you today?"}],
+ ["Looking for admin with property manage\u2026","Gigs \u00b7 Labor","Phoenix","8/31","Office & front desk","watch",3,"custom","","Property manager wanting admin help. Aging post.",{hook:"Property managers often lose time to repetitive admin, and a small tool can take some of it.",ask:"Which task takes up the most time?"}],
+ ["Part Time Check-in Person for Local Vacat\u2026","Jobs \u00b7 Real estate","not shown","8/31","Office & front desk","watch",2,"custom","","Vacation rental check-ins can be handled by messages and door codes. Aging post.",{hook:"Guest check-in can often be handled with automated messages and door codes.",ask:"How do guests check in now?"}]
+];
+
+var TIERS={top:"Start here",strong:"Strong",test:"Worth a test",watch:"Watch"};
+var TIER_ORDER={top:0,strong:1,test:2,watch:3};
+var STATUSES=[["new","New"],["opened","Opened post"],["copied","Copied draft"],["sent","Sent"],["replied","Got a reply"],["booked","Call booked"],["passed","Passed"]];
+var STATUS_ORDER={};STATUSES.forEach(function(s,i){STATUS_ORDER[s[0]]=i;});
+var DEFAULT_QUOTE="a quoting tool that turns job details into a clear written quote, so estimates go out faster";
+
+/* ---------- state and storage ---------- */
+var mem={};
+function sGet(k){try{return window.localStorage.getItem(k);}catch(e){return mem[k]==null?null:mem[k];}}
+function sSet(k,v){try{window.localStorage.setItem(k,v);}catch(e){mem[k]=v;}}
+function sDel(k){try{window.localStorage.removeItem(k);}catch(e){delete mem[k];}}
+var KEY="phxTriage.v1";
+var state={status:{},notes:{},edits:{},settings:{name:"Lamar",company:"",phone:"",demo:"",quote:DEFAULT_QUOTE}};
+try{var raw=sGet(KEY);if(raw){var p=JSON.parse(raw);["status","notes","edits","settings"].forEach(function(k){if(p&&p[k]){for(var i in p[k]){state[k][i]=p[k][i];}}});}}catch(e){}
+function save(){sSet(KEY,JSON.stringify(state));}
+
+var view={q:"",tier:"all",lane:"all",src:"all",age:"all",status:"active",sort:"fit",dir:"desc"};
+var openIds={};var tabById={};
+
+/* ---------- lead objects ---------- */
+var YEAR=2026;
+var today=new Date();today.setHours(0,0,0,0);
+var leads=LEADS.map(function(a,i){
+  var ex=a[10]||{};
+  var parts=a[3].split("/");var d=new Date(YEAR,parseInt(parts[0],10)-1,parseInt(parts[1],10));
+  return {id:"L"+(i+1),t:a[0],src:a[1],area:a[2],posted:a[3],date:d,lane:a[4],tier:a[5],fit:a[6],kind:a[7],tr:a[8],why:a[9],note:ex.note||"",hook:ex.hook||"",ask:ex.ask||""};
+});
+var byId={};leads.forEach(function(l){byId[l.id]=l;});
+function daysAgo(l){return Math.round((today-l.date)/86400000);}
+function ageInfo(l){
+  var n=daysAgo(l);var txt,cls;
+  if(n<=0){txt="today";}else if(n===1){txt="1 day ago";}else{txt=n+" days ago";}
+  if(n<=3)cls="hot";else if(n<=10)cls="fresh1";else if(n<=21)cls="aging";else cls="stale";
+  return {n:n,txt:txt,cls:cls};
+}
+function statusOf(id){return state.status[id]||"new";}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function clean(t){
+  var c=t.replace(/\S*(?:\u2026|\.{3})/g,"").replace(/\*+/g,"").replace(/\s+/g," ");
+  var o=(c.match(/\(/g)||[]).length,cl=(c.match(/\)/g)||[]).length;
+  if(o>cl){c=c.slice(0,c.lastIndexOf("("));}
+  return c.replace(/[\s\-\u2013\u2014,:\/&+$(]+$/,"").replace(/^[\s\-\u2013\u2014,:\/&+]+/,"").trim();
+}
+function short(t,n){var c=clean(t);return c.length>n?c.slice(0,n).replace(/\s+\S*$/,""):c;}
+function isCut(t){return /\u2026|\.{3}/.test(t);}
+function $(s){return document.querySelector(s);}
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+function findUrl(l){
+  var site=/tucson/i.test(l.area)?"tucson":"phoenix";
+  var cat=/^Jobs/.test(l.src)?"jjj":"ggg";
+  var words=clean(l.t).replace(/[^A-Za-z0-9 &\/-]/g," ").split(/\s+/).slice(0,6).join(" ");
+  return "https://"+site+".craigslist.org/search/"+cat+"?query="+encodeURIComponent(words);
+}
+
+/* ---------- drafts ---------- */
+function sigBlock(S){return [S.name||"Lamar",S.company,S.phone].filter(Boolean).join("\n");}
+function draftFor(l){
+  var S=state.settings;var q=(S.quote||DEFAULT_QUOTE).replace(/^I built\s+/i,"").replace(/[.\s]+$/,"");
+  var demo=S.demo?("Here is a short look at it: "+S.demo+"\n\n"):"";
+  var remote="I work remotely, so there is nothing to install on site and no visit needed.";
+  var cut=isCut(l.t);
+  var subject=cut?"Quick question about your Craigslist post":"Re: "+clean(l.t);
+  var body,text;
+  var ct=clean(l.t);
+  var st="Hi, this is "+(S.name||"Lamar")+". I saw your Craigslist post"+((cut||ct.length>70)?". ":" ("+ct+"). ");
+  if(l.kind==="est"){
+    body="Hi,\n\nI saw your post for a "+l.tr+". "+(l.hook||"Getting quotes out quickly is usually what an estimator is there for, so I thought this could help while you are hiring, or after.")+"\n\nI built "+q+". I am not applying for the job. I am reaching out because it could take some of the repetitive quoting work off whoever does it now.\n\n"+remote+"\n\n"+demo+"Tell me how quotes get built at your company today and I will say honestly whether it would help.\n\nThanks,\n"+sigBlock(S);
+  }else if(l.kind==="crew"||l.kind==="route"){
+    var hk=l.hook||(l.kind==="crew"?"Hiring usually means there is more work than hands, and quoting is often the next thing to pile up.":"When a service business is growing, quoting new customers by phone and text can take time away from the actual work.");
+    body="Hi,\n\nI saw your post looking for "+l.tr+". "+hk+"\n\nI built "+q+". I am not applying for the job. I am reaching out because it might save you time on quotes.\n\n"+remote+"\n\n"+demo+"How do you handle quotes today? If it is already smooth, no problem at all.\n\nThanks,\n"+sigBlock(S);
+  }else if(l.kind==="web"){
+    body="Hi,\n\nI saw your post about a contractor website. I build websites, and I can include "+q+", so visitors can ask for a quote right from the site.\n\n"+remote+"\n\n"+demo+"What trade are you in, and what do you want the site to do for you?\n\nThanks,\n"+sigBlock(S);
+  }else{
+    body="Hi,\n\nI saw your post"+(cut?"":", \u201c"+clean(l.t)+"\u201d")+". I build small custom software tools that take repetitive office work off people. "+(l.hook||"A tool might cover part of what this role does.")+"\n\n"+remote+"\n\n"+(l.ask||"What takes the most time in that role today?")+" If a tool would not help, no problem at all.\n\nThanks,\n"+sigBlock(S);
+  }
+  if(l.kind==="custom"){
+    text=st+"I build small software tools that take repetitive work off people. If that could help, I can explain in two lines. If not, just say no thanks and I will not follow up.";
+  }else if(l.kind==="web"){
+    text=st+"I build websites and can include "+q+". Not a job application, just thought it might help. "+(S.demo?"Short look: "+S.demo+". ":"")+"If not, just say no thanks and I will not follow up.";
+  }else{
+    text=st+"I built "+q+". Not a job application, just thought it might save you time on quotes. "+(S.demo?"Short look: "+S.demo+". ":"")+"If not, just say no thanks and I will not follow up.";
+  }
+  return {subject:subject,email:body,text:text};
+}
+function currentDraft(l){
+  var g=draftFor(l);var e=state.edits[l.id]||{};
+  return {subject:e.subject!=null?e.subject:g.subject,email:e.email!=null?e.email:g.email,text:e.text!=null?e.text:g.text};
+}
+
+/* ---------- filtering and sorting ---------- */
+function matches(l){
+  if(view.tier!=="all"&&l.tier!==view.tier)return false;
+  if(view.lane!=="all"&&l.lane!==view.lane)return false;
+  if(view.src!=="all"&&l.src.indexOf(view.src)!==0)return false;
+  var n=daysAgo(l);
+  if(view.age==="7"&&n>7)return false;
+  if(view.age==="14"&&n>14)return false;
+  if(view.age==="old"&&n<=14)return false;
+  var s=statusOf(l.id);
+  if(view.status==="active"){if(s==="passed")return false;}
+  else if(view.status!=="all"&&s!==view.status)return false;
+  if(view.q){
+    var hay=(l.t+" "+l.area+" "+l.lane+" "+l.src+" "+l.why+" "+l.tr+" "+l.note).toLowerCase();
+    var terms=view.q.toLowerCase().split(/\s+/).filter(Boolean);
+    for(var i=0;i<terms.length;i++){if(hay.indexOf(terms[i])<0)return false;}
+  }
+  return true;
+}
+function cmp(a,b){
+  var d=view.dir==="asc"?1:-1,r=0;
+  if(view.sort==="fit"){r=a.fit-b.fit;if(r===0)r=TIER_ORDER[b.tier]-TIER_ORDER[a.tier];}
+  else if(view.sort==="posted"){r=a.date-b.date;}
+  else if(view.sort==="title"){r=clean(a.t).localeCompare(clean(b.t));}
+  else if(view.sort==="lane"){r=a.lane.localeCompare(b.lane)||(a.fit-b.fit);}
+  else if(view.sort==="status"){r=STATUS_ORDER[statusOf(a.id)]-STATUS_ORDER[statusOf(b.id)];}
+  if(r===0)r=a.date-b.date;
+  return r*d;
+}
+
+/* ---------- rendering ---------- */
+function bars(n){var h='<span class="bars" role="img" aria-label="Fit '+n+' out of 5">';for(var i=1;i<=5;i++)h+='<i class="'+(i<=n?"on":"")+'"></i>';return h+"</span>";}
+function statusSelect(l){
+  var cur=statusOf(l.id);
+  var o=STATUSES.map(function(s){return '<option value="'+s[0]+'"'+(s[0]===cur?" selected":"")+">"+s[1]+"</option>";}).join("");
+  return '<label class="lbl" for="st-'+l.id+'">Status</label><select class="status-sel s-'+cur+'" id="st-'+l.id+'" aria-label="Status for '+esc(clean(l.t))+'" data-status="'+l.id+'">'+o+"</select>";
+}
+function panelHtml(l){
+  var d=currentDraft(l);var tab=tabById[l.id]||"email";
+  var notes=state.notes[l.id]||"";
+  function pane(name,inner){return '<div class="tabpane" data-pane="'+name+'"'+(tab===name?"":" hidden")+">"+inner+"</div>";}
+  var emailPane='<p class="tip">Edit freely. Copying moves this lead to \u201cCopied draft.\u201d</p>'+
+    '<div class="field"><label for="sub-'+l.id+'">Subject</label><input type="text" id="sub-'+l.id+'" data-edit="subject" data-id="'+l.id+'" value="'+esc(d.subject)+'"></div>'+
+    '<div class="field"><label for="em-'+l.id+'">Email or Craigslist reply</label><textarea id="em-'+l.id+'" rows="14" data-edit="email" data-id="'+l.id+'">'+esc(d.email)+'</textarea></div>'+
+    '<div class="row-actions"><button type="button" class="btn small" data-copy="email" data-id="'+l.id+'">Copy message</button><button type="button" class="btn ghost small" data-copy="subject" data-id="'+l.id+'">Copy subject</button><button type="button" class="btn ghost small" data-reset="'+l.id+'">Reset to template</button></div>';
+  var textPane='<p class="tip">Use a text only if the post invites texts. Otherwise use the Craigslist reply.</p>'+
+    '<div class="field"><label for="tx-'+l.id+'">Text message</label><textarea id="tx-'+l.id+'" rows="6" data-edit="text" data-id="'+l.id+'">'+esc(d.text)+'</textarea></div>'+
+    '<div class="row-actions"><button type="button" class="btn small" data-copy="text" data-id="'+l.id+'">Copy text</button><span class="count" id="cnt-'+l.id+'">'+d.text.length+' characters</span></div>';
+  var notesPane='<div class="field"><label for="nt-'+l.id+'">Your notes on this post</label><textarea id="nt-'+l.id+'" rows="6" data-notes="'+l.id+'" placeholder="What the post says, the pay, who to ask for">'+esc(notes)+'</textarea></div>';
+  return '<div class="panel" id="panel-'+l.id+'"'+(openIds[l.id]?"":" hidden")+'>'+
+    '<div class="tabs" role="tablist" aria-label="Draft options">'+
+    ["email","text","notes"].map(function(n){var lab={email:"Email",text:"Text",notes:"Notes"}[n];return '<button type="button" role="tab" aria-selected="'+(tab===n)+'" data-tab="'+n+'" data-id="'+l.id+'">'+lab+"</button>";}).join("")+
+    "</div>"+pane("email",emailPane)+pane("text",textPane)+pane("notes",notesPane)+"</div>";
+}
+function leadHtml(l){
+  var a=ageInfo(l);var open=!!openIds[l.id];
+  return '<li class="lead" id="row-'+l.id+'" role="row">'+
+   '<div class="lead-main">'+
+    '<div class="c c-fit" role="cell"><span class="chip t-'+l.tier+'">'+TIERS[l.tier]+"</span>"+bars(l.fit)+"</div>"+
+    '<div class="c" role="cell"><h3>'+esc(l.t)+'</h3><div class="meta-line"><span>'+esc(l.area)+'</span><span>Posted '+l.posted+' <span class="fresh '+a.cls+'">('+a.txt+")</span></span></div></div>"+
+    '<div class="c" role="cell"><span class="lbl">Why it fits</span><p class="why">'+esc(l.why)+"</p>"+(l.note?'<span class="note">'+esc(l.note)+"</span>":"")+"</div>"+
+    '<div class="c" role="cell"><span class="lbl">Type of business</span><span class="lane">'+esc(l.lane)+'</span><span class="src">'+esc(l.src)+"</span></div>"+
+    '<div class="c" role="cell">'+statusSelect(l)+"</div>"+
+    '<div class="c acts" role="cell"><button type="button" class="btn small" data-toggle="'+l.id+'" aria-expanded="'+open+'" aria-controls="panel-'+l.id+'">'+(open?"Hide draft":"Draft and notes")+'</button><a class="btn ghost small" href="'+esc(findUrl(l))+'" target="_blank" rel="noopener" data-found="'+l.id+'">Find post</a></div>'+
+   "</div>"+panelHtml(l)+"</li>";
+}
+function renderPicks(){
+  var tops=leads.filter(function(l){return l.tier==="top";}).sort(function(a,b){return ((b.kind==="est")-(a.kind==="est"))||(b.fit-a.fit)||(b.date-a.date);});
+  $("#picks").innerHTML=tops.map(function(l){
+    var a=ageInfo(l);
+    return '<li class="pick"><h3>'+esc(l.t)+'</h3><div class="meta">'+esc(l.area)+', posted '+l.posted+' ('+a.txt+')</div><p class="why">'+esc(l.why)+'</p><div class="row-actions"><button type="button" class="btn small" data-jump="'+l.id+'">Open draft</button><a class="btn ghost small" href="'+esc(findUrl(l))+'" target="_blank" rel="noopener">Find post</a></div></li>';
+  }).join("");
+}
+function renderStats(){
+  var top=leads.filter(function(l){return l.tier==="top";}).length;
+  var week=leads.filter(function(l){return daysAgo(l)<=7;}).length;
+  var sent=leads.filter(function(l){var s=statusOf(l.id);return s==="sent"||s==="replied"||s==="booked";}).length;
+  $("#stats").innerHTML=
+   '<div class="stat"><b>'+leads.length+'</b><span>leads reviewed</span></div>'+
+   '<div class="stat"><b>'+top+'</b><span>places to start</span></div>'+
+   '<div class="stat"><b>'+week+'</b><span>posted in the last 7 days</span></div>'+
+   '<div class="stat"><b>'+sent+'</b><span>sent so far</span></div>';
+}
+function renderList(){
+  var list=leads.filter(matches).sort(cmp);
+  $("#count").textContent=list.length+" of "+leads.length+" leads shown";
+  $("#tracker").innerHTML=list.length?list.map(leadHtml).join(""):'<li class="empty">No leads match these filters. Clear a filter to see more.</li>';
+  $$(".tracker-head button[data-sort]").forEach(function(b){
+    if(b.getAttribute("data-sort")===view.sort){b.setAttribute("aria-sort",view.dir==="asc"?"ascending":"descending");}else{b.removeAttribute("aria-sort");}
+  });
+  var ss=$("#sortSel");if(ss)ss.value=view.sort+":"+view.dir;
+  renderStats();
+}
+function fillSelect(id,opts,val){
+  $(id).innerHTML=opts.map(function(o){return '<option value="'+esc(o[0])+'">'+esc(o[1])+"</option>";}).join("");$(id).value=val;
+}
+function buildFilters(){
+  fillSelect("#fTier",[["all","All priorities"],["top","Start here"],["strong","Strong"],["test","Worth a test"],["watch","Watch"]],view.tier);
+  var lanes=[];leads.forEach(function(l){if(lanes.indexOf(l.lane)<0)lanes.push(l.lane);});
+  fillSelect("#fLane",[["all","All types"]].concat(lanes.map(function(x){return [x,x];})),view.lane);
+  fillSelect("#fSrc",[["all","Jobs and gigs"],["Jobs","Jobs"],["Gigs","Gigs"]],view.src);
+  fillSelect("#fAge",[["all","Any date"],["7","Last 7 days"],["14","Last 14 days"],["old","Older than 14 days"]],view.age);
+  fillSelect("#fStatus",[["active","Not passed"],["all","Everything"]].concat(STATUSES.map(function(s){return [s[0],s[1]];})),view.status);
+  fillSelect("#sortSel",[["fit:desc","Best fit first"],["posted:desc","Newest first"],["posted:asc","Oldest first"],["title:asc","Title A to Z"],["lane:asc","Type of business"],["status:asc","Status"]],view.sort+":"+view.dir);
+}
+
+/* ---------- interactions ---------- */
+var toastTimer;
+function toast(msg){var t=$("#toast");t.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.textContent="";},3500);}
+function copyText(txt,done){
+  function fallback(){
+    var ta=document.createElement("textarea");ta.value=txt;ta.setAttribute("readonly","");ta.style.position="absolute";ta.style.left="-9999px";document.body.appendChild(ta);ta.select();
+    var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+    document.body.removeChild(ta);done(ok);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},fallback);}else{fallback();}
+}
+function setStatus(id,val,quiet){
+  state.status[id]=val;save();
+  if(val==="passed"&&view.status==="active"&&!quiet){toast("Moved to Passed. Set the Status filter to Everything to see it again.");}
+}
+function scrollToRow(id){
+  var el=document.getElementById("row-"+id);
+  if(el){el.scrollIntoView({behavior:"smooth",block:"start"});var b=el.querySelector("[data-toggle]");if(b)b.focus({preventScroll:true});}
+}
+document.addEventListener("click",function(e){
+  var t=e.target.closest("button,a");if(!t)return;
+  var id;
+  if(t.hasAttribute("data-toggle")){
+    id=t.getAttribute("data-toggle");openIds[id]=!openIds[id];
+    var p=document.getElementById("panel-"+id);if(p)p.hidden=!openIds[id];
+    t.setAttribute("aria-expanded",String(!!openIds[id]));t.textContent=openIds[id]?"Hide draft":"Draft and notes";
+    if(openIds[id]&&statusOf(id)==="new"){setStatus(id,"opened");var s=document.getElementById("st-"+id);if(s){s.value="opened";s.className="status-sel s-opened";}renderStats();}
+  }else if(t.hasAttribute("data-jump")){
+    id=t.getAttribute("data-jump");
+    view.q="";view.tier="all";view.lane="all";view.src="all";view.age="all";view.status="all";
+    buildFilters();$("#q").value="";openIds[id]=true;renderList();scrollToRow(id);
+  }else if(t.hasAttribute("data-tab")){
+    id=t.getAttribute("data-id");var name=t.getAttribute("data-tab");tabById[id]=name;
+    var panel=document.getElementById("panel-"+id);
+    $$("#panel-"+id+" .tabpane").forEach(function(x){x.hidden=x.getAttribute("data-pane")!==name;});
+    $$("#panel-"+id+" [data-tab]").forEach(function(x){x.setAttribute("aria-selected",String(x.getAttribute("data-tab")===name));});
+  }else if(t.hasAttribute("data-copy")){
+    id=t.getAttribute("data-id");var what=t.getAttribute("data-copy");var l=byId[id];var d=currentDraft(l);
+    copyText(d[what],function(ok){
+      if(ok){
+        toast("Copied. Paste it into Craigslist or your email.");
+        if(what!=="subject"){var cur=statusOf(id);if(cur==="new"||cur==="opened"){setStatus(id,"copied",true);var s=document.getElementById("st-"+id);if(s){s.value="copied";s.className="status-sel s-copied";}renderStats();}}
+      }else{toast("Your browser blocked copying. Select the text and copy it by hand.");}
+    });
+  }else if(t.hasAttribute("data-reset")){
+    id=t.getAttribute("data-reset");delete state.edits[id];save();
+    var g=draftFor(byId[id]);
+    var a1=document.getElementById("sub-"+id),a2=document.getElementById("em-"+id),a3=document.getElementById("tx-"+id);
+    if(a1)a1.value=g.subject;if(a2)a2.value=g.email;if(a3){a3.value=g.text;var c=document.getElementById("cnt-"+id);if(c)c.textContent=g.text.length+" characters";}
+    toast("Draft reset to the template.");
+  }else if(t.hasAttribute("data-found")){
+    id=t.getAttribute("data-found");if(statusOf(id)==="new"){setStatus(id,"opened");var s2=document.getElementById("st-"+id);if(s2){s2.value="opened";s2.className="status-sel s-opened";}renderStats();}
+  }else if(t.hasAttribute("data-sort")){
+    var k=t.getAttribute("data-sort");
+    if(view.sort===k){view.dir=view.dir==="asc"?"desc":"asc";}else{view.sort=k;view.dir=(k==="fit"||k==="posted")?"desc":"asc";}
+    renderList();
+  }else if(t.hasAttribute("data-size")&&t.closest(".seg")){
+    setSize(t.getAttribute("data-size"));
+  }
+});
+document.addEventListener("change",function(e){
+  var t=e.target;
+  if(t.hasAttribute("data-status")){setStatus(t.getAttribute("data-status"),t.value);t.className="status-sel s-"+t.value;renderStats();if(t.value==="passed"&&view.status==="active"){renderList();}}
+});
+document.addEventListener("input",function(e){
+  var t=e.target;var id=t.getAttribute&&t.getAttribute("data-id");
+  if(t.hasAttribute&&t.hasAttribute("data-edit")){
+    var f=t.getAttribute("data-edit");state.edits[id]=state.edits[id]||{};state.edits[id][f]=t.value;save();
+    if(f==="text"){var c=document.getElementById("cnt-"+id);if(c)c.textContent=t.value.length+" characters";}
+  }else if(t.hasAttribute&&t.hasAttribute("data-notes")){
+    state.notes[t.getAttribute("data-notes")]=t.value;save();
+  }
+});
+
+/* filters */
+$("#q").addEventListener("input",function(){view.q=this.value.trim();renderList();});
+[["#fTier","tier"],["#fLane","lane"],["#fSrc","src"],["#fAge","age"],["#fStatus","status"]].forEach(function(p){
+  $(p[0]).addEventListener("change",function(){view[p[1]]=this.value;renderList();});
+});
+$("#sortSel").addEventListener("change",function(){var v=this.value.split(":");view.sort=v[0];view.dir=v[1];renderList();});
+$("#clearBtn").addEventListener("click",function(){
+  view.q="";view.tier="all";view.lane="all";view.src="all";view.age="all";view.status="active";
+  $("#q").value="";buildFilters();renderList();
+});
+
+/* settings fields: changing them refreshes drafts that have no manual edits */
+function bindSetting(id,key){
+  var el=$(id);el.value=state.settings[key]||"";
+  el.addEventListener("input",function(){
+    state.settings[key]=el.value;save();
+    Object.keys(byId).forEach(function(k){
+      if(!document.getElementById("panel-"+k))return;var e=state.edits[k]||{};var g=draftFor(byId[k]);
+      var a1=document.getElementById("sub-"+k),a2=document.getElementById("em-"+k),a3=document.getElementById("tx-"+k);
+      if(a2&&e.email==null)a2.value=g.email;
+      if(a1&&e.subject==null)a1.value=g.subject;
+      if(a3&&e.text==null){a3.value=g.text;var c=document.getElementById("cnt-"+k);if(c)c.textContent=g.text.length+" characters";}
+    });
+  });
+}
+bindSetting("#f-name","name");bindSetting("#f-company","company");bindSetting("#f-phone","phone");bindSetting("#f-demo","demo");bindSetting("#f-quote","quote");
+
+/* export and reset */
+function csvCell(v){v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function buildCsv(){
+  var head=["Priority","Fit","Title","Area","Posted","Type of business","Board","Why it fits","Note","Status","My notes"];
+  var rows=leads.slice().sort(cmp).map(function(l){
+    var st=STATUSES.filter(function(s){return s[0]===statusOf(l.id);})[0][1];
+    return [TIERS[l.tier],l.fit,l.t,l.area,l.posted,l.lane,l.src,l.why,l.note,st,state.notes[l.id]||""].map(csvCell).join(",");
+  });
+  return [head.join(",")].concat(rows).join("\r\n");
+}
+function plainDownload(csv){
+  var blob=new Blob([csv],{type:"text/csv"});var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="phoenix-lead-triage.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+function copyCsvInstead(csv){copyText(csv,function(ok){toast(ok?"Saving was blocked, so the CSV is on your clipboard. Paste it into a spreadsheet.":"Saving and copying were both blocked in this view.");});}
+$("#exportBtn").addEventListener("click",function(){
+  var csv=buildCsv();
+  var viaViewer=(window.claude&&typeof window.claude.use==="function")?window.claude.use("downloads"):Promise.resolve(null);
+  Promise.resolve(viaViewer).then(function(dl){
+    if(dl){
+      return dl.save({filename:"phoenix-lead-triage.csv",data:csv}).then(function(){toast("CSV saved.");},function(err){
+        if(err&&err.code==="declined"){toast("Download cancelled.");}else{copyCsvInstead(csv);}
+      });
+    }
+    try{plainDownload(csv);toast("CSV download started.");}catch(err){copyCsvInstead(csv);}
+  });
+});
+var resetArmed=false,resetTimer;
+$("#resetBtn").addEventListener("click",function(){
+  var b=this;
+  if(!resetArmed){
+    resetArmed=true;b.textContent="Click again to clear everything";
+    resetTimer=setTimeout(function(){resetArmed=false;b.textContent="Reset statuses and notes";},4000);
+    return;
+  }
+  clearTimeout(resetTimer);resetArmed=false;b.textContent="Reset statuses and notes";
+  state.status={};state.notes={};state.edits={};save();renderList();toast("Statuses, notes and edited drafts cleared. Your details stay.");
+});
+
+/* text size and theme */
+function setSize(v){
+  document.documentElement.setAttribute("data-size",v);sSet("phxTriage.size",v);
+  $$(".seg button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-size")===v));});
+}
+function setTheme(v){
+  document.documentElement.setAttribute("data-theme",v);sSet("phxTriage.theme",v);
+  var b=$("#themeBtn");b.setAttribute("aria-pressed",String(v==="dark"));b.textContent=v==="dark"?"Switch to light":"Switch to dark";
+}
+$("#themeBtn").addEventListener("click",function(){setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark");});
+setSize(sGet("phxTriage.size")||"m");
+setTheme(sGet("phxTriage.theme")||"light");
+
+/* init */
+buildFilters();renderPicks();renderList();
+})();
+</script>
+</body>
+</html>
