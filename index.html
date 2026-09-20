@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>Phoenix lead triage</title>
+<title>Craigslist lead triage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -226,6 +226,22 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
 .toast{min-height:1.5em;color:var(--ok);font-weight:600;text-align:center}
 .empty{padding:28px 16px;text-align:center;color:var(--ink-2);border:1px dashed var(--line);border-radius:16px}
 
+
+/* city band */
+.cityband{padding-top:20px;padding-bottom:20px;background:var(--surface)}
+.citywrap{display:flex;flex-direction:column;gap:10px;align-items:center}
+.citylabel{font-size:1.1rem}
+.cities{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.citybtn{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow-sm)}
+.citybtn span{color:var(--ink-3);font-weight:500;font-size:.9rem}
+.citybtn[aria-pressed="true"]{background:var(--ocean);border-color:var(--ocean);color:var(--ocean-ink)}
+.citybtn[aria-pressed="true"] span{color:var(--ocean-ink);opacity:.85}
+.morerow{justify-content:center;margin-top:16px}
+.morerow[hidden],.morerow button[hidden]{display:none}
+.badge{display:inline-flex;align-items:center;min-height:26px;padding:2px 10px;border-radius:999px;font-weight:700;font-size:.8rem;white-space:nowrap;border:1px solid var(--turq);color:var(--turq-ink);background:var(--surface)}
+.badge.read{border-color:var(--line);color:var(--ink-2);background:var(--surface-2)}
+.cityname{font-weight:700;color:var(--ink-2)}
+
 /* wider layouts */
 @media (min-width:600px) and (max-width:999px){
   .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -238,6 +254,8 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
   .setaside{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
 }
 @media (min-width:768px){
+  .citywrap{flex-direction:row;align-items:center;gap:20px}
+  .cities{justify-content:flex-start}
   .masthead{text-align:left}
   .masthead .lede{margin-left:0}
   .tools{justify-content:flex-end}
@@ -246,6 +264,7 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
   .resultbar{justify-content:space-between}
   .foot{text-align:left}
   .foot .row-actions{justify-content:flex-start}
+  .morerow{justify-content:flex-start}
   .toast{text-align:left}
 }
 @media (min-width:1000px){
@@ -261,7 +280,7 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
   .lead-main>.c:nth-child(6){grid-column:2;grid-row:3}
 }
 @media (min-width:1180px){
-  .filters{grid-template-columns:2fr repeat(5,1fr)}
+  .filters{grid-template-columns:2fr repeat(6,minmax(0,1fr))}
   .filters .search{grid-column:auto}
   #sortwrap{display:none}
   .tablewrap{border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);background:var(--surface)}
@@ -316,19 +335,24 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
   </div>
   <div class="mh">
     <div class="mh-text">
-      <h1>Phoenix lead triage</h1>
-      <p class="lede">Trade and service businesses that posted on Craigslist Phoenix, ranked by how well your quote tool fits them. Every entry comes from a title in your screenshots. Open the post before you send anything.</p>
+      <h1>Craigslist lead triage</h1>
+      <p class="lede">Phoenix, Tucson and Flagstaff posts, ranked by how well they fit your quote tool and your remote software work. Every entry starts from a title in your screenshots. Open the post before you send anything, then bring it to me so we can tailor the message together.</p>
     </div>
     <div class="stats" id="stats" aria-live="polite"></div>
   </div>
 </header>
 
+<section class="band cityband" aria-labelledby="cityLabel">
+  <div class="citywrap"><h2 id="cityLabel" class="citylabel">City</h2><div class="cities" id="cities" role="group" aria-labelledby="cityLabel"></div></div>
+</section>
+
 <section class="band" aria-labelledby="picksH">
   <div class="section-head">
     <h2 id="picksH">Where I would start</h2>
-    <p>These twelve combine a clear quoting need, a business that looks small and local, and a recent post. The estimator posts come first because the seat has been open for weeks.</p>
+    <p id="picksIntro">The strongest matches in the city you pick above. Estimator posts come first, because an estimator seat that keeps getting re-posted is the clearest sign of quoting pain.</p>
   </div>
   <ul class="picks" id="picks"></ul>
+  <div class="row-actions morerow"><button type="button" class="btn ghost small" id="picksMore" hidden>Show every start-here lead</button></div>
 </section>
 
 <section class="band" aria-labelledby="detH">
@@ -360,6 +384,7 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
     <div><label for="fSrc">Board</label><select id="fSrc"></select></div>
     <div><label for="fAge">Posted</label><select id="fAge"></select></div>
     <div><label for="fStatus">Status</label><select id="fStatus"></select></div>
+    <div><label for="fUpd">Update</label><select id="fUpd"></select></div>
     <div id="sortwrap"><label for="sortSel">Sort by</label><select id="sortSel"></select></div>
   </div>
   <div class="resultbar"><span id="count"></span><button type="button" class="btn ghost small" id="clearBtn">Clear filters</button></div>
@@ -404,14 +429,16 @@ details.card .inner{padding:0 18px 16px;color:var(--ink-2)}
         <li><b>Lead-generation and platform recruiters.</b> Lawn-care "pros" posts, the 813-number plumber and electrician post, the Rentatech handyman posts. They look like platforms, though I did not verify that.</li>
         <li><b>Homeowner requests.</b> Titles like "Looking for Roofer 85260" and "Fix leaky hose bib" read as customers, not trade businesses.</li>
         <li><b>Bid invitations.</b> "Invitation to bid, HOA perimeter" and "Seeking bids for sanding" are the buyer side. The contractors who answer are your audience, but you cannot reach them from here.</li>
-        <li><b>Content, writing, and social media gigs.</b> Left out on purpose: the tracker only lists software pain you can fix remotely.</li>
+        <li><b>Content, writing, and social media gigs.</b> Left out on purpose, except remote assistant roles where a small tool could take over routine work.</li>
+        <li><b>Recruiting platforms and national brands.</b> Wayfair Home Services "LLC owners" ads, LeafHome canvassers, Allied Universal, Sevita, and the trucking and driver posts. Big employers or platforms, not small businesses you can reach.</li>
+        <li><b>Caregiving, restaurants, salons, retail.</b> Almost all in person, so they cannot be solved remotely.</li>
       </ul>
     </div>
   </details>
 </section>
 
 <footer class="band foot">
-  <p>Screenshots were taken September 18 to 20, 2026, and cover part-time and contract jobs plus paid gigs. Full-time jobs and several job categories were not captured. Titles only; the post bodies are unread. The "Find post" links run an ordinary Craigslist search by title, and I could not test them from my workspace.</p>
+  <p>Screenshots were taken September 18 to 20, 2026, and cover part-time and contract jobs plus paid gigs. Full-time jobs are not covered. Tucson is still missing its general labor, software, web design, systems, tech support and writing job pages. Flagstaff has few local posts, so many of its pages show Phoenix and Las Vegas posts instead. Titles only, except the two posts marked Post read. The "Find post" links run an ordinary Craigslist search by title, and I could not test them from my workspace.</p>
   <div class="row-actions">
     <button type="button" class="btn ghost small" id="exportBtn">Download CSV</button>
     <button type="button" class="btn ghost small" id="resetBtn">Reset statuses and notes</button>
@@ -519,9 +546,9 @@ var LEADS=[
  ["Manager-Maintenance Team","Jobs \u00b7 Business","Phoenix","9/2","Handyman & property","watch",2,"crew","a maintenance team manager","Post says little from the title."],
  ["Handyman / Maintenance Technician\u2026","Jobs \u00b7 General labor","central/south phx","8/30","Handyman & property","watch",2,"crew","a maintenance technician","Older post."],
  /* office and front desk */
- ["Email multiple recipients sent individually in outlook","Gigs \u00b7 Computer","Gilbert","9/17","Office & front desk","top",5,"custom","","Also posted 8/20, so nobody has solved it. It is a small, defined software fix you can build and deliver remotely.",{hook:"Reading your post, this sounds like a mail-merge problem. I can build a small tool that sends one message to a list as individual emails, each addressed to the person, so it is one click instead of a repetitive task.",ask:"Is this a one-time list, or something you send on a regular basis?"}],
- ["Receptionist Desert Wind Shutters & \u2026","Jobs \u00b7 Admin/office","Tucson","9/19","Office & front desk","top",5,"crew","a receptionist","Custom shutters and blinds are priced job by job, and they are hiring front-desk help. It is also in Tucson, your home turf.",{hook:"Shutters and blinds are usually priced job by job, so I thought this might be relevant."}],
- ["ACCOUNTING/OFFICE **PART TIME**","Jobs \u00b7 Admin/office","not shown","9/17","Office & front desk","strong",3,"custom","","Posted in more than one category. Part-time back-office help often means invoicing and data entry a tool could take over.",{hook:"Part-time office help often covers invoicing, data entry and follow-ups, and a small tool can handle a lot of that.",ask:"Which task takes the most time in that role today?"}],
+ ["Email multiple recipients sent individually in outlook","Gigs \u00b7 Computer","Gilbert","9/17","Office & front desk","top",5,"custom","","Post read: they want one email sent to a list as individual messages, more than Outlook allows in a day, and they want to learn the process. Small, defined, remote.",{read:true,note:"First reply asks about volume, account type, whether recipients expect the email, personalization and budget. Also posted 8/20.",hook:"Reading your post, this sounds like a mail-merge problem. I can build a small tool that sends one message to a list as individual emails, each addressed to the person, so it is one click instead of a repetitive task.",ask:"Is this a one-time list, or something you send on a regular basis?"}],
+ ["Receptionist Desert Wind Shutters & \u2026","Jobs \u00b7 Admin/office","Tucson","9/19","Office & front desk","watch",1,"crew","a receptionist","Post read: a part-time, on-site receptionist and showroom sales job, $17 to $20 an hour, Saturdays required. Not a software request.",{hook:"Shutters and blinds are usually priced job by job, so I thought this might be relevant.",read:true,note:"The duties include scheduling sales and install appointments, tracking orders and entering product, so a tool could help this business, but that is a different pitch from the post."}],
+ ["ACCOUNTING/OFFICE **PART TIME**","Jobs \u00b7 Admin/office","Tucson","9/17","Office & front desk","strong",3,"custom","","Posted in admin, finance and customer service. Part-time back-office help often means invoicing and data entry a tool could take over.",{hook:"Part-time office help often covers invoicing, data entry and follow-ups, and a small tool can handle a lot of that.",ask:"Which task takes the most time in that role today?",note:"Shows up in three Tucson categories. In Tucson, so it is close to home."}],
  ["Customer Service & Appointment S\u2026","Jobs \u00b7 Customer service","28th St & Indian School","9/9","Office & front desk","strong",3,"custom","","Appointment setting is a booking and reminder problem, which software solves well.",{hook:"Appointment setting is often a booking and reminder problem, and a small tool can handle much of it.",ask:"How do customers book with you today?"}],
  ["Sales and Packing Assistant","Jobs \u00b7 Admin/office","Tempe","9/16","Office & front desk","test",3,"custom","","Order handling and packing lists are automatable. Small e-commerce or wholesale outfit by the sound of it.",{hook:"Order handling and packing lists are often something a small tool can do for you.",ask:"How do orders reach you now?"}],
  ["General Administrative & Operations \u2026","Jobs \u00b7 Admin/office","Gilbert","9/15","Office & front desk","test",3,"custom","","Broad admin role. Open it to see which parts repeat.",{hook:"Admin and operations roles often have a few repeating tasks a small tool can take over.",ask:"What repeats most in that role?"}],
@@ -535,11 +562,114 @@ var LEADS=[
  ["Looking for admin with property manage\u2026","Gigs \u00b7 Labor","Phoenix","8/31","Office & front desk","watch",3,"custom","","Property manager wanting admin help. Aging post.",{hook:"Property managers often lose time to repetitive admin, and a small tool can take some of it.",ask:"Which task takes up the most time?"}],
  ["Part Time Check-in Person for Local Vacat\u2026","Jobs \u00b7 Real estate","not shown","8/31","Office & front desk","watch",2,"custom","","Vacation rental check-ins can be handled by messages and door codes. Aging post.",{hook:"Guest check-in can often be handled with automated messages and door codes.",ask:"How do guests check in now?"}]
 ];
+/* ---- update 2: Phoenix additions, Tucson, Flagstaff, Las Vegas (nearby), remote ---- */
+function N(city,t,src,area,posted,lane,tier,fit,kind,tr,why,ex){ex=ex||{};ex.city=city;ex.batch=2;return [t,src,area,posted,lane,tier,fit,kind,tr,why,ex];}
+LEADS=LEADS.concat([
+ /* Tucson: high */
+ N("Tucson","SIMPLE WEBSITE DESIGNER/DEVEL…","Gigs · Computer","Tucson","9/17","Websites","top",5,"dev","a simple website designer/developer","Someone wants a website built, posted in Tucson's computer gigs. Remote work you already do."),
+ N("Tucson","On-Call 1099 HVAC Lead Subcontractor …","Gigs · Talent","Tucson","9/7","HVAC, plumbing, electrical","top",5,"crew","an on-call 1099 HVAC lead subcontractor","An HVAC company (Mark Air Conditioning & Heating Services, per its logo) hiring a lead. Local, and service calls are quoted one by one."),
+ N("Tucson","LICENSED PLUMBER NEEDED TUCS…","Gigs · Labor","Greater Tucson Area","9/17","HVAC, plumbing, electrical","top",4,"crew","a licensed plumber","Same “stellar” logo as the Phoenix plumber and HVAC posts, so one company hiring in two cities."),
+ N("Tucson","Sub Contractors Wanted","Jobs · Skilled trades","Tucson","9/16","Masonry, framing, remodel","top",4,"crew","subcontractors","A Tucson contractor adding subs. The title is generic, so open it to see the trade."),
+ N("Tucson","Flooring Installers Needed / Necesitamo…","Jobs · Skilled trades","Tucson","9/15","Flooring & finishes","top",4,"crew","flooring installers","Posted 9/3 and 9/15 under an IMPACT logo. Flooring is priced from measurements.",{note:"Bilingual title. Check the post before choosing a language for the reply."}),
+ N("Tucson","Remodeler Labor","Jobs · Skilled trades","NW Tucson","9/14","Masonry, framing, remodel","top",4,"crew","remodeler labor","A remodeler adding hands. Every remodel starts with a quote."),
+ N("Tucson","Shed Builders Needed ASAP","Jobs · Skilled trades","Tucson","9/7","Masonry, framing, remodel","top",4,"crew","shed builders","Sheds are priced per build, and “ASAP” suggests orders are waiting."),
+ N("Tucson","NOW HIRING - HOUSE AND OFFICE C…","Jobs · Customer service","Tucson, AZ","9/18","Cleaning, pools, pest","top",4,"route","house and office cleaners","A cleaning company hiring. Home and office jobs are quoted by size."),
+ N("Tucson","1099 Building Contractor Crews needed!","Jobs · Skilled trades","Tucson","9/8","Masonry, framing, remodel","strong",4,"crew","1099 building contractor crews","A builder recruiting 1099 crews.",{note:"The same post and pool-house image also appears for Las Vegas (9/15)."}),
+ N("Tucson","Mobile Auto Mechanic Wanted $25.00 a…","Jobs · Skilled trades","Tucson","8/26","Auto & mechanics","strong",4,"crew","a mobile auto mechanic","A mobile mechanic business. You said the quote tool was built for the auto industry.",{hook:"Mobile repair jobs need parts and labor quoted before anyone rolls a truck, and that back and forth eats time."}),
+ N("Tucson","Hiring Roofers!","Jobs · Skilled trades","Tucson","8/26","Roofing","strong",4,"crew","roofers","A local roofer with a phone number in the flyer. Nearly a month old, so it may be filled."),
+ N("Tucson","ASAP INCOME ALL TRADES … HVAC…","Gigs · Labor","“Guaranteed ongoing job…” (as listed)","9/17","HVAC, plumbing, electrical","test",3,"crew","tradespeople for ongoing work","Reads like the Phoenix “ASAP WORK: HVAC REMODEL ELECT…” post. Could be a recruiter, so check."),
+ /* Tucson: medium and watch */
+ N("Tucson","Mason & Handyman","Jobs · Skilled trades","Tucson search","9/12","Masonry, framing, remodel","test",3,"crew","a mason and handyman","Small outfit by the sound of it."),
+ N("Tucson","Entrepreneurial Contractor Wanted — P…","Jobs · Skilled trades","Tucson","8/27","Masonry, framing, remodel","test",3,"crew","an entrepreneurial contractor","A company looking for an independent contractor. The image shows an apartment building, so possibly property work."),
+ N("Tucson","Ceramic Tile Setter Wanted- $25.00 an…","Jobs · Skilled trades","Tucson","8/26","Flooring & finishes","test",3,"crew","a ceramic tile setter","Tile jobs are priced by area. Older post."),
+ N("Tucson","Low Voltage Technician","Jobs · Skilled trades","Tucson area","8/30","HVAC, plumbing, electrical","test",3,"crew","a low voltage technician","Low-voltage work is priced by the project."),
+ N("Tucson","Need Experienced Residential Painter / …","Gigs · Labor","Tucson","9/6","Flooring & finishes","test",3,"crew","an experienced residential painter","Painting is priced by surface area."),
+ N("Tucson","Experienced Tile Setter / Instalador de M…","Gigs · Labor","Tucson","9/6","Flooring & finishes","test",3,"crew","an experienced tile setter","Bilingual title."),
+ N("Tucson","Wanted: mobile mechanic / car part partn…","Gigs · Labor","Tucson","9/2","Auto & mechanics","test",3,"crew","a mobile mechanic","A mobile mechanic looking for a partner.",{hook:"Quoting parts and labor up front is often a back and forth that a tool can shorten."}),
+ N("Tucson","Cleaner for vacant homes","Gigs · Domestic","Tucson","9/8","Cleaning, pools, pest","test",3,"route","a cleaner for vacant homes","Turnover cleaning for property owners or managers."),
+ N("Tucson","FAST AND THOROUGH CLEANERS","Gigs · Domestic","Vail","9/2","Cleaning, pools, pest","test",3,"route","cleaners","A small cleaning company with a flyer."),
+ N("Tucson","Tree removal crew needed. Must have in…","Gigs · Labor","Stone Ave, Tucson","8/27","Landscape & tree","test",3,"route","a tree removal crew","Tree removal is quoted per tree."),
+ N("Tucson","AUTO SALES REPRESENTATIVE","Jobs · Sales","Tucson (Car World, N Oracle)","9/4","Auto & mechanics","test",2,"crew","an auto sales representative","A dealership hiring sales. Deal quotes are part of the job."),
+ N("Tucson","Light Maintenance Helper Needed","Gigs · Labor","Tucson","9/18","Handyman & property","test",2,"crew","a light maintenance helper","The title says little."),
+ N("Tucson","Framers needed","Jobs · Skilled trades","Tucson search","8/26","Masonry, framing, remodel","watch",2,"crew","framers","Older post."),
+ N("Tucson","BEST BUY AV INSTALLER ( EXPERIEN…","Jobs · Skilled trades","Tucson","9/11","Specialty install","watch",2,"crew","an AV installer","The title mentions Best Buy, so it may be a retailer's install contractor."),
+ N("Tucson","Maintenance / Repair","Jobs · Skilled trades","Tucson","9/9","Handyman & property","watch",2,"crew","a maintenance and repair hand","The title says little."),
+ N("Tucson","Looking for landscapers with experience…","Gigs · Labor","Tucson","8/27","Landscape & tree","watch",2,"route","experienced landscapers","Older post, and the pool photo hints at a homeowner."),
+ N("Tucson","Need someone to trim, weed and clean","Gigs · Labor","Oro Valley","9/7","Landscape & tree","watch",2,"route","someone to trim, weed and clean","Reads like a homeowner."),
+ /* remote, software, office */
+ N("Remote","Online Learning Community Instructors (…","Jobs · Education","Online","9/15","Remote & software","strong",3,"custom","","Online instructors for a learning community. You asked whether your software could do that job; the post will say.",{hook:"Online learning communities usually have scheduling, sign-ups and follow-ups to manage, and a small tool can take some of that off you.",ask:"Which part of running the community takes the most time?"}),
+ N("Tucson","Virtual Assistant / Social Media Facilitator","Gigs · Event","Tucson","8/28","Remote & software","test",3,"custom","","A remote assistant role. Scheduling posts and routine messages can be automated.",{hook:"Scheduling posts and handling routine messages is the kind of work a small tool can take over.",ask:"Which tasks fill most of the assistant's day?"}),
+ N("Tucson","photoshop help","Gigs · Computer","Tucson","9/9","Websites","test",3,"dev","photoshop help","A design task, remote-friendly. The post will say whether it is a one-time edit."),
+ N("Remote","Graduate Finance Assistant","Jobs · Finance","Remote","9/14","Remote & software","test",3,"custom","","A remote finance role. Repeating spreadsheet and reporting work is tool-shaped.",{hook:"Repeating spreadsheet and reporting work is something a small tool can take over.",ask:"Which reports or spreadsheets take the most time?"}),
+ N("Phoenix","Fully Remote Part-Time Arizona ABS Com…","Jobs · Legal","Phoenix","9/15","Remote & software","test",3,"custom","","Fully remote and part-time. The title is cut off, so open it to see what it is.",{hook:"Compliance and paperwork tasks often repeat, and a small tool can handle a lot of that.",ask:"Which part of the work repeats the most?"}),
+ N("Phoenix","Marketing Paid Intern Needed","Jobs · Marketing","East Valley","9/17","Remote & software","test",3,"custom","","The image shows luxury homes, so possibly real estate marketing. Check whether it is remote."),
+ N("Phoenix","Transportation Coordinator","Jobs · Food/bev/hosp","Sun City (Royal Oaks)","9/18","Office & front desk","test",3,"custom","","A senior community coordinating rides. Scheduling is software-shaped, but the role is likely on site.",{hook:"Coordinating rides is a scheduling problem, and a small tool can take much of it off someone's desk.",ask:"How do you schedule rides today?"}),
+ N("Tucson","Licensed Insurance Agent/Manager","Jobs · Admin/office","Tucson (also Mesa, Flagstaff)","9/8","Office & front desk","test",2,"custom","","The same post appears in several categories and cities, so probably one agency recruiting. Insurance is a quote business.",{hook:"Insurance shops spend a lot of time building and comparing quotes, and a small tool can speed some of that up.",ask:"How do quotes get built today?"}),
+ N("Tucson","Back Up Administrative/Accounting Assistant","Jobs · Finance","Tucson","8/24","Office & front desk","watch",3,"custom","","Back-office help. Older post."),
+ N("Tucson","Video Contributors (Remote/Flexible…","Gigs · Domestic","Tucson","9/14","Remote & software","watch",2,"custom","","Looks like a platform paying for video clips. Open it to see whether there is anything to build."),
+ N("Tucson","Remote English Video Conversation Partn…","Gigs · Computer","Tucson (also Phoenix, Las Vegas)","8/28","Remote & software","watch",2,"custom","","Posted in several categories and cities. You wanted to know what it is."),
+ N("Tucson","DENTAL ASSISTANT FOR MOBILE","Jobs · Healthcare","Ft. Thomas / San Carlos","8/31","Office & front desk","watch",2,"custom","","A mobile dental setup. Scheduling and billing may be the software angle, but the role is hands-on."),
+ N("Tucson","Property Business Manager","Jobs · Real estate","not shown","8/29","Office & front desk","watch",2,"custom","","The image looks AI-generated and the title is in quotes. Read it carefully before replying."),
+ N("Tucson","Part Time Customer Sales – Flexible Wo…","Jobs · Customer service","Tucson","9/8","Office & front desk","watch",2,"custom","","The title says little."),
+ N("Phoenix","Real Estate Photographer / Videographer","Jobs · Media","Maricopa County","9/4","Remote & software","watch",2,"custom","","A flyer for real estate photo and video work. You mentioned redoing photos with AI; the post will say if that fits."),
+ N("Phoenix","graphic artist","Jobs · Media","central phoenix","9/13","Websites","watch",2,"dev","a graphic artist","You have done graphic art. Check whether it is a one-off."),
+ /* Phoenix additions from the computer gigs and sales pages */
+ N("Phoenix","Trouble shoot a motion sensor animated …","Gigs · Computer","Chandler","9/4","Remote & software","test",3,"dev","troubleshooting help with a motion sensor animation","Someone stuck on a tech problem. Open it to see whether it is software you can fix remotely."),
+ N("Phoenix","Paid Reddit Contributor - Phoenix - $30 f…","Gigs · Computer","Phoenix","9/17","Remote & software","watch",2,"custom","","Pays people to post on Reddit. Not a software request unless the post asks for tooling.",{note:"A similar “Phoenix Reddit users wanted” post appeared 9/5."}),
+ N("Phoenix","Hiring Photographers – Remote | $30/hr","Gigs · Computer","west valley","8/31","Remote & software","watch",2,"custom","","You asked what remote photographers means. Open it to see."),
+ N("Phoenix","Social Media Marketer for a Leading War…","Gigs · Computer","USA","9/16","Remote & software","test",2,"custom","","A remote marketing role for what looks like a warehouse company.",{hook:"Recurring social posting and reporting is the kind of work a small tool can take over.",ask:"Which tasks take the most time each week?"}),
+ N("Phoenix","Assistant / Social Media Facilitator Needed","Gigs · Event","Tempe","9/19","Remote & software","test",3,"custom","","A remote assistant role. Scheduling posts and routine messages can be automated.",{hook:"Scheduling posts and handling routine messages is the kind of work a small tool can take over.",ask:"Which tasks fill most of the assistant's day?"}),
+ N("Phoenix","12-Volt Car Audio Installer Needed – Me…","Gigs · Computer","Mesa","9/11","Auto & mechanics","test",3,"crew","a 12-volt car audio installer","Installs are quoted per vehicle and per system.",{hook:"Car audio installs get quoted per vehicle and per system, and that takes time before any work starts."}),
+ N("Phoenix","Experienced Mobile Mechanic Needed T…","Gigs · Labor","west valley","9/12","Auto & mechanics","test",3,"crew","an experienced mobile mechanic","A mobile mechanic business hiring.",{hook:"Mobile repair jobs need parts and labor quoted before anyone rolls a truck, and that back and forth eats time."}),
+ N("Phoenix","Body & Paint Helper Wanted – Part Time","Gigs · Labor","Phoenix","8/21","Auto & mechanics","watch",3,"crew","a body and paint helper","Body shops quote from damage estimates. Older post.",{hook:"Body shops build an estimate for every repair, and that takes time before any work starts."}),
+ N("Phoenix","Calling All Aspiring Mechanics! Jo…","Gigs · Labor","east valley","9/3","Auto & mechanics","watch",2,"crew","mechanics","A shop recruiting. The title is cut off."),
+ N("Phoenix","Field sales, independent auto shops -$3…","Jobs · Sales","east valley","8/23","Auto & mechanics","watch",3,"custom","","The image is an ad for CallKeep, a missed-call service for shops. It shows what auto shops are being sold.",{note:"Useful as a look at the competition, not as a buyer."}),
+ N("Phoenix","Now Hiring Sales Rep for Painting Co","Jobs · Sales","East Valley","9/16","Flooring & finishes","strong",4,"crew","a sales rep","A painting company hiring salespeople, and every customer needs a quote.",{hook:"When a painting company is hiring sales people, building a quote for each customer is usually a big part of the job."}),
+ N("Phoenix","Roofing Canvasser / Neighborhood Mar…","Jobs · Sales","East Valley","9/11","Roofing","strong",3,"crew","roofing canvassers","Pro Roofing (per the flyer) recruiting canvassers. The leads they generate need quotes.",{hook:"When a roofing company is knocking on doors, every lead it turns up needs a quote."}),
+ N("Phoenix","Roofing Sales - High Income Potential","Jobs · Sales","Phoenix","8/29","Roofing","test",3,"crew","roofing sales reps","Roofing sales, likely commission. Older post.",{hook:"When a roofing company is hiring sales people, building a quote for each customer is usually a big part of the job."}),
+ N("Phoenix","PART-TIME CLIENT RELATIONS & SA…","Jobs · Sales","Scottsdale","9/7","HVAC, plumbing, electrical","test",3,"crew","client relations and sales","e2o Mechanical (per the logo) is an indoor-environment and HVAC outfit; sales there involve quotes.",{hook:"When a mechanical company is hiring sales people, building a quote for each customer is usually a big part of the job."}),
+ N("Phoenix","Security Camera Field Tech - $35/hr +…","Jobs · Systems/networking","Phoenix","9/8","HVAC, plumbing, electrical","test",3,"crew","a security camera field tech","Security installs are quoted per site."),
+ N("Phoenix","low voltage cabling Project no experienc…","Gigs · Computer","west valley","8/29","HVAC, plumbing, electrical","watch",2,"crew","low voltage cabling help","Older post."),
+ N("Phoenix","Fire Alarm Tech Needed for Service Call","Gigs · Event","Tempe","9/15","HVAC, plumbing, electrical","test",3,"crew","a fire alarm tech","A service company short-handed on a call."),
+ N("Phoenix","Remote Customer Service Representati…","Jobs · Customer service","central/south phx","9/3","Remote & software","watch",2,"custom","","A remote service role. The title says little."),
+ /* Flagstaff and Northern Arizona */
+ N("Flagstaff","Paint Estimator","Gigs · Labor","Flagstaff","9/10","Estimating","top",5,"est","paint estimator","Posted 9/3, 9/8 and 9/10. Painting is priced from surface area, so this is the open estimating seat again, this time in Flagstaff.",{note:"Same three dates as the Epoxy Flooring Installer post, so possibly one company."}),
+ N("Flagstaff","Epoxy Flooring Installer - $18.00 to $…","Gigs · Labor","Flagstaff","9/10","Flooring & finishes","top",4,"crew","an epoxy flooring installer","Posted six times since 8/21. A company that keeps needing an installer, and epoxy floors are quoted by the square foot.",{note:"Also posted 8/21, 8/24, 8/27, 9/3 and 9/8."}),
+ N("Flagstaff","EXPERIENCED GUTTER PROTECTIO…","Jobs · Sales","Quad Cities","9/16","Specialty install","top",4,"crew","gutter protection sales reps","Exterior Solutions NAZ (per the image) sells outdoor shades and gutter covers, quoted per home. A Northern Arizona company.",{hook:"When a company that sells shades and gutter covers is hiring sales people, building a quote for every home is usually a big part of the job.",note:"A “SALES REPRESENTATIVE, Gutter Cov…” post from 8/25 looks like the same company."}),
+ N("Flagstaff","Vinyl Plank & Laminate Flooring Installers","Jobs · Skilled trades","Prescott / Flagstaff / Cottonwood","9/18","Flooring & finishes","strong",4,"crew","vinyl plank and laminate flooring installers","A flooring company hiring across Northern Arizona. Priced from measurements."),
+ N("Flagstaff","Carpet Installers","Jobs · Skilled trades","Prescott Valley and surrounding","9/18","Flooring & finishes","strong",4,"crew","carpet installers","Western States Flooring logo. Carpet jobs are quoted by the room."),
+ N("Flagstaff","FLOORING SUBCONTRACTORS INCL…","Jobs · Skilled trades","Lake Havasu","9/19","Flooring & finishes","strong",3,"crew","flooring subcontractors","Keller logo. Keller also posts “CARPET CREWS WANTED!!!” in Phoenix, so one company is recruiting in several regions."),
+ N("Flagstaff","EXPERIENCED PAINTER NEEDED \"PA…","Jobs · Skilled trades","Flagstaff / Sedona / Verde Valley","9/1","Flooring & finishes","strong",3,"crew","an experienced painter","A painting outfit hiring around Flagstaff."),
+ N("Flagstaff","Commercial sign fabricator/installation tr…","Jobs · General labor","Prescott","9/14","Specialty install","strong",4,"crew","a commercial sign fabricator/installer","Sign work is quoted per job from size and materials.",{hook:"Sign shops price every job from size and materials, and quoting takes time before any work starts."}),
+ N("Flagstaff","***EXPERIENCED Gazebo And Playset…","Jobs · General labor","Prescott and surrounding","9/18","Specialty install","strong",4,"crew","gazebo and playset installers","Gazebos and playsets are quoted per install.",{note:"A “***EXPERIENCED Fitness Equipment In…” post from the same day looks like the same poster."}),
+ N("Flagstaff","***EXPERIENCED Fitness Equipment In…","Jobs · General labor","Prescott and surrounding","9/18","Specialty install","test",3,"crew","fitness equipment installers","Likely the same company as the gazebo post."),
+ N("Flagstaff","CARPET INSTALLERS","Jobs · Skilled trades","Havasu / Kingman / Bullhead","9/18","Flooring & finishes","test",3,"crew","carpet installers","Another carpet post in the Havasu area."),
+ N("Flagstaff","Cabinet shop","Jobs · General labor","Chino Valley","9/14","Masonry, framing, remodel","test",3,"crew","cabinet shop help","Cabinet shops quote every job."),
+ N("Flagstaff","!!SKILLED LABORER NEEDED!!! Start I…","Gigs · Domestic","Valle, AZ (south of the Grand Canyon)","9/19","Masonry, framing, remodel","test",3,"crew","a skilled laborer","Posted 9/19 and 8/21."),
+ N("Flagstaff","Part-Time Handyman/Build Helper –…","Gigs · Labor","Valle","9/19","Handyman & property","test",3,"crew","a handyman and build helper","A build outfit needing a helper."),
+ N("Flagstaff","Subcontractor Crews Wanted- Property…","Jobs · General labor","Flagstaff area","8/28","Handyman & property","test",3,"crew","subcontractor crews","Property work. It may be a national property-preservation firm, so check."),
+ N("Flagstaff","Masonry labor needed","Jobs · General labor","Kingman","9/14","Masonry, framing, remodel","test",3,"crew","masonry labor","Masons quote by the wall or job. Kingman is far from Flagstaff."),
+ N("Flagstaff","Immediate Work For Self Employed Trad…","Jobs · Skilled trades","Kingman","9/2","Masonry, framing, remodel","test",3,"crew","self-employed tradespeople","A contractor offering work to self-employed trades."),
+ N("Flagstaff","Construction landscape helper.","Jobs · General labor","Prescott west","9/16","Landscape & tree","test",3,"route","a construction landscape helper","A landscape crew adding a helper."),
+ N("Flagstaff","Climber/arborist/groundsman","Jobs · Skilled trades","Flagstaff","9/3","Landscape & tree","test",3,"route","a climber/arborist/groundsman","Tree work is quoted tree by tree."),
+ N("Flagstaff","Hiring Cleaners","Jobs · General labor","Flagstaff area","9/7","Cleaning, pools, pest","test",3,"route","cleaners","A cleaning company hiring. Cleaning jobs are quoted by size."),
+ N("Flagstaff","$115 – YARDWORK Helper w/ tools…","Gigs · Labor","Flagstaff","8/24","Landscape & tree","watch",2,"route","a yardwork helper","Posted 8/23 and 8/24."),
+ N("Flagstaff","Carpentry part time. Landscaping, mo…","Gigs · Labor","Bellemont","8/25","Masonry, framing, remodel","watch",2,"crew","a part-time carpenter and landscaper","Older post."),
+ /* Las Vegas (shows up in Flagstaff's nearby results) */
+ N("Las Vegas","Freelance estimator","Jobs · Engineering","Las Vegas","9/8","Estimating","top",4,"est","freelance estimator","A freelance estimating seat. It shows up in Flagstaff's nearby results.",{note:"Las Vegas is outside your three cities, but an open estimator post is worth a look."}),
+ N("Las Vegas","Bodyshop owner needs outside sale…","Jobs · Customer service","Las Vegas area","9/3","Auto & mechanics","strong",4,"custom","","An auto body shop owner hiring outside sales. Body shops estimate every repair, and auto is the industry you said the quote tool was built for.",{hook:"Body shops build an estimate for every repair, and a tool that speeds that up helps a sales person too.",ask:"How are repair quotes built today?"}),
+ N("Las Vegas","Auto Body technicians/ part time mechanic","Jobs · Skilled trades","Las Vegas","9/11","Auto & mechanics","test",3,"crew","auto body technicians and a part-time mechanic","A shop hiring.",{hook:"Body shops build an estimate for every repair, and that takes time before any work starts."}),
+ N("Las Vegas","DRAIN CLEANING APPRENTICE —…","Jobs · Customer service","Las Vegas","8/31","HVAC, plumbing, electrical","test",3,"crew","a drain cleaning apprentice","A drain company hiring. Jobs are quoted by scope."),
+ N("Las Vegas","Carpet Cleaning Assistant","Jobs · Admin/office","Las Vegas","8/24","Cleaning, pools, pest","test",3,"route","a carpet cleaning assistant","Raysco, Inc. logo. Carpet cleaning is quoted by area."),
+ N("Las Vegas","Skilled flooring installation helper needed","Jobs · Skilled trades","Clark County","9/17","Flooring & finishes","test",3,"crew","a skilled flooring installation helper","A flooring company adding a helper.")
+]);
 
 var TIERS={top:"Start here",strong:"Strong",test:"Worth a test",watch:"Watch"};
 var TIER_ORDER={top:0,strong:1,test:2,watch:3};
 var STATUSES=[["new","New"],["opened","Opened post"],["copied","Copied draft"],["sent","Sent"],["replied","Got a reply"],["booked","Call booked"],["passed","Passed"]];
 var STATUS_ORDER={};STATUSES.forEach(function(s,i){STATUS_ORDER[s[0]]=i;});
+var CITIES=["Phoenix","Tucson","Flagstaff","Las Vegas","Remote"];
+var LATEST_BATCH=2;
 var DEFAULT_QUOTE="a quoting tool that turns job details into a clear written quote, so estimates go out faster";
 
 /* ---------- state and storage ---------- */
@@ -552,7 +682,8 @@ var state={status:{},notes:{},edits:{},settings:{name:"Lamar",company:"",phone:"
 try{var raw=sGet(KEY);if(raw){var p=JSON.parse(raw);["status","notes","edits","settings"].forEach(function(k){if(p&&p[k]){for(var i in p[k]){state[k][i]=p[k][i];}}});}}catch(e){}
 function save(){sSet(KEY,JSON.stringify(state));}
 
-var view={q:"",tier:"all",lane:"all",src:"all",age:"all",status:"active",sort:"fit",dir:"desc"};
+var view={city:"all",q:"",tier:"all",lane:"all",src:"all",age:"all",status:"active",upd:"all",sort:"fit",dir:"desc"};
+try{var savedCity=sGet("phxTriage.city");if(savedCity)view.city=savedCity;}catch(e){}
 var openIds={};var tabById={};
 
 /* ---------- lead objects ---------- */
@@ -561,7 +692,7 @@ var today=new Date();today.setHours(0,0,0,0);
 var leads=LEADS.map(function(a,i){
   var ex=a[10]||{};
   var parts=a[3].split("/");var d=new Date(YEAR,parseInt(parts[0],10)-1,parseInt(parts[1],10));
-  return {id:"L"+(i+1),t:a[0],src:a[1],area:a[2],posted:a[3],date:d,lane:a[4],tier:a[5],fit:a[6],kind:a[7],tr:a[8],why:a[9],note:ex.note||"",hook:ex.hook||"",ask:ex.ask||""};
+  return {id:"L"+(i+1),t:a[0],src:a[1],area:a[2],posted:a[3],date:d,lane:a[4],tier:a[5],fit:a[6],kind:a[7],tr:a[8],why:a[9],note:ex.note||"",hook:ex.hook||"",ask:ex.ask||"",city:ex.city||(/tucson/i.test(a[2])?"Tucson":"Phoenix"),batch:ex.batch||1,read:!!ex.read};
 });
 var byId={};leads.forEach(function(l){byId[l.id]=l;});
 function daysAgo(l){return Math.round((today-l.date)/86400000);}
@@ -586,7 +717,7 @@ function isCut(t){return /\u2026|\.{3}/.test(t);}
 function $(s){return document.querySelector(s);}
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
 function findUrl(l){
-  var site=/tucson/i.test(l.area)?"tucson":"phoenix";
+  var site=l.city==="Tucson"?"tucson":(l.city==="Flagstaff"?"flagstaff":(l.city==="Las Vegas"?"lasvegas":"phoenix"));
   var cat=/^Jobs/.test(l.src)?"jjj":"ggg";
   var words=clean(l.t).replace(/[^A-Za-z0-9 &\/-]/g," ").split(/\s+/).slice(0,6).join(" ");
   return "https://"+site+".craigslist.org/search/"+cat+"?query="+encodeURIComponent(words);
@@ -608,12 +739,16 @@ function draftFor(l){
   }else if(l.kind==="crew"||l.kind==="route"){
     var hk=l.hook||(l.kind==="crew"?"Hiring usually means there is more work than hands, and quoting is often the next thing to pile up.":"When a service business is growing, quoting new customers by phone and text can take time away from the actual work.");
     body="Hi,\n\nI saw your post looking for "+l.tr+". "+hk+"\n\nI built "+q+". I am not applying for the job. I am reaching out because it might save you time on quotes.\n\n"+remote+"\n\n"+demo+"How do you handle quotes today? If it is already smooth, no problem at all.\n\nThanks,\n"+sigBlock(S);
+  }else if(l.kind==="dev"){
+    body="Hi,\n\nI saw your post looking for "+l.tr+". I build websites and small software tools, and I work remotely, so this can be done without a visit.\n\n"+(l.ask||"What is it for, roughly what do you need built, and do you have a budget in mind?")+" Once I know that, I can tell you if it is a good fit and give you a fixed price.\n\nThanks,\n"+sigBlock(S);
   }else if(l.kind==="web"){
     body="Hi,\n\nI saw your post about a contractor website. I build websites, and I can include "+q+", so visitors can ask for a quote right from the site.\n\n"+remote+"\n\n"+demo+"What trade are you in, and what do you want the site to do for you?\n\nThanks,\n"+sigBlock(S);
   }else{
     body="Hi,\n\nI saw your post"+(cut?"":", \u201c"+clean(l.t)+"\u201d")+". I build small custom software tools that take repetitive office work off people. "+(l.hook||"A tool might cover part of what this role does.")+"\n\n"+remote+"\n\n"+(l.ask||"What takes the most time in that role today?")+" If a tool would not help, no problem at all.\n\nThanks,\n"+sigBlock(S);
   }
-  if(l.kind==="custom"){
+  if(l.kind==="dev"){
+    text=st+"I build websites and small software tools and work remotely. Happy to answer questions and give a fixed price. If it is not a fit, just say no thanks and I will not follow up.";
+  }else if(l.kind==="custom"){
     text=st+"I build small software tools that take repetitive work off people. If that could help, I can explain in two lines. If not, just say no thanks and I will not follow up.";
   }else if(l.kind==="web"){
     text=st+"I build websites and can include "+q+". Not a job application, just thought it might help. "+(S.demo?"Short look: "+S.demo+". ":"")+"If not, just say no thanks and I will not follow up.";
@@ -628,7 +763,10 @@ function currentDraft(l){
 }
 
 /* ---------- filtering and sorting ---------- */
+function inCity(l){return view.city==="all"||l.city===view.city;}
 function matches(l){
+  if(!inCity(l))return false;
+  if(view.upd==="new"&&l.batch<LATEST_BATCH)return false;
   if(view.tier!=="all"&&l.tier!==view.tier)return false;
   if(view.lane!=="all"&&l.lane!==view.lane)return false;
   if(view.src!=="all"&&l.src.indexOf(view.src)!==0)return false;
@@ -640,7 +778,7 @@ function matches(l){
   if(view.status==="active"){if(s==="passed")return false;}
   else if(view.status!=="all"&&s!==view.status)return false;
   if(view.q){
-    var hay=(l.t+" "+l.area+" "+l.lane+" "+l.src+" "+l.why+" "+l.tr+" "+l.note).toLowerCase();
+    var hay=(l.t+" "+l.city+" "+l.area+" "+l.lane+" "+l.src+" "+l.why+" "+l.tr+" "+l.note).toLowerCase();
     var terms=view.q.toLowerCase().split(/\s+/).filter(Boolean);
     for(var i=0;i<terms.length;i++){if(hay.indexOf(terms[i])<0)return false;}
   }
@@ -668,7 +806,7 @@ function panelHtml(l){
   var d=currentDraft(l);var tab=tabById[l.id]||"email";
   var notes=state.notes[l.id]||"";
   function pane(name,inner){return '<div class="tabpane" data-pane="'+name+'"'+(tab===name?"":" hidden")+">"+inner+"</div>";}
-  var emailPane='<p class="tip">Edit freely. Copying moves this lead to \u201cCopied draft.\u201d</p>'+
+  var emailPane='<p class="tip">This draft is built from the title only. Read the post, send me what it says, and I will rewrite it to fit. Copying moves this lead to \u201cCopied draft.\u201d</p>'+
     '<div class="field"><label for="sub-'+l.id+'">Subject</label><input type="text" id="sub-'+l.id+'" data-edit="subject" data-id="'+l.id+'" value="'+esc(d.subject)+'"></div>'+
     '<div class="field"><label for="em-'+l.id+'">Email or Craigslist reply</label><textarea id="em-'+l.id+'" rows="14" data-edit="email" data-id="'+l.id+'">'+esc(d.email)+'</textarea></div>'+
     '<div class="row-actions"><button type="button" class="btn small" data-copy="email" data-id="'+l.id+'">Copy message</button><button type="button" class="btn ghost small" data-copy="subject" data-id="'+l.id+'">Copy subject</button><button type="button" class="btn ghost small" data-reset="'+l.id+'">Reset to template</button></div>';
@@ -685,27 +823,37 @@ function leadHtml(l){
   var a=ageInfo(l);var open=!!openIds[l.id];
   return '<li class="lead" id="row-'+l.id+'" role="row">'+
    '<div class="lead-main">'+
-    '<div class="c c-fit" role="cell"><span class="chip t-'+l.tier+'">'+TIERS[l.tier]+"</span>"+bars(l.fit)+"</div>"+
-    '<div class="c" role="cell"><h3>'+esc(l.t)+'</h3><div class="meta-line"><span>'+esc(l.area)+'</span><span>Posted '+l.posted+' <span class="fresh '+a.cls+'">('+a.txt+")</span></span></div></div>"+
+    '<div class="c c-fit" role="cell"><span class="chip t-'+l.tier+'">'+TIERS[l.tier]+"</span>"+bars(l.fit)+(l.read?'<span class="badge read">Post read</span>':"")+(l.batch>=LATEST_BATCH&&LATEST_BATCH>1?'<span class="badge" title="Added in the latest update">Just added</span>':"")+"</div>"+
+    '<div class="c" role="cell"><h3>'+esc(l.t)+'</h3><div class="meta-line"><span class="cityname">'+esc(l.city)+'</span>'+(l.area.toLowerCase()===l.city.toLowerCase()?"":'<span>'+esc(l.area)+'</span>')+'<span>Posted '+l.posted+' <span class="fresh '+a.cls+'">('+a.txt+")</span></span></div></div>"+
     '<div class="c" role="cell"><span class="lbl">Why it fits</span><p class="why">'+esc(l.why)+"</p>"+(l.note?'<span class="note">'+esc(l.note)+"</span>":"")+"</div>"+
     '<div class="c" role="cell"><span class="lbl">Type of business</span><span class="lane">'+esc(l.lane)+'</span><span class="src">'+esc(l.src)+"</span></div>"+
     '<div class="c" role="cell">'+statusSelect(l)+"</div>"+
     '<div class="c acts" role="cell"><button type="button" class="btn small" data-toggle="'+l.id+'" aria-expanded="'+open+'" aria-controls="panel-'+l.id+'">'+(open?"Hide draft":"Draft and notes")+'</button><a class="btn ghost small" href="'+esc(findUrl(l))+'" target="_blank" rel="noopener" data-found="'+l.id+'">Find post</a></div>'+
    "</div>"+panelHtml(l)+"</li>";
 }
+var picksAll=false;
 function renderPicks(){
-  var tops=leads.filter(function(l){return l.tier==="top";}).sort(function(a,b){return ((b.kind==="est")-(a.kind==="est"))||(b.fit-a.fit)||(b.date-a.date);});
-  $("#picks").innerHTML=tops.map(function(l){
+  var pool=leads.filter(inCity).filter(function(l){return l.tier==="top";}).sort(function(a,b){return ((b.kind==="est")-(a.kind==="est"))||(b.fit-a.fit)||(b.date-a.date);});
+  var CAP=12;var shown=picksAll?pool:pool.slice(0,CAP);
+  $("#picks").innerHTML=shown.length?shown.map(function(l){
     var a=ageInfo(l);
-    return '<li class="pick"><h3>'+esc(l.t)+'</h3><div class="meta">'+esc(l.area)+', posted '+l.posted+' ('+a.txt+')</div><p class="why">'+esc(l.why)+'</p><div class="row-actions"><button type="button" class="btn small" data-jump="'+l.id+'">Open draft</button><a class="btn ghost small" href="'+esc(findUrl(l))+'" target="_blank" rel="noopener">Find post</a></div></li>';
-  }).join("");
+    return '<li class="pick"><h3>'+esc(l.t)+'</h3><div class="meta">'+esc(l.city)+(l.area.toLowerCase()===l.city.toLowerCase()?"":", "+esc(l.area))+', posted '+l.posted+' ('+a.txt+')</div><p class="why">'+esc(l.why)+'</p><div class="row-actions"><button type="button" class="btn small" data-jump="'+l.id+'">Open draft</button><a class="btn ghost small" href="'+esc(findUrl(l))+'" target="_blank" rel="noopener">Find post</a></div></li>';
+  }).join(""):'<li class="empty">No start-here leads in this city yet.</li>';
+  var more=$("#picksMore");
+  if(pool.length>CAP){more.hidden=false;more.textContent=picksAll?"Show fewer":"Show all "+pool.length+" start-here leads";}else{more.hidden=true;}
+}
+function renderCities(){
+  var counts={all:leads.length};CITIES.forEach(function(c){counts[c]=0;});leads.forEach(function(l){counts[l.city]=(counts[l.city]||0)+1;});
+  var opts=[["all","All cities"]].concat(CITIES.filter(function(c){return counts[c]>0;}).map(function(c){return [c,c];}));
+  $("#cities").innerHTML=opts.map(function(o){return '<button type="button" class="citybtn" data-city="'+esc(o[0])+'" aria-pressed="'+(view.city===o[0])+'">'+esc(o[1])+' <span>'+counts[o[0]]+'</span></button>';}).join("");
 }
 function renderStats(){
-  var top=leads.filter(function(l){return l.tier==="top";}).length;
-  var week=leads.filter(function(l){return daysAgo(l)<=7;}).length;
-  var sent=leads.filter(function(l){var s=statusOf(l.id);return s==="sent"||s==="replied"||s==="booked";}).length;
+  var pool=leads.filter(inCity);
+  var top=pool.filter(function(l){return l.tier==="top";}).length;
+  var week=pool.filter(function(l){return daysAgo(l)<=7;}).length;
+  var sent=pool.filter(function(l){var s=statusOf(l.id);return s==="sent"||s==="replied"||s==="booked";}).length;
   $("#stats").innerHTML=
-   '<div class="stat"><b>'+leads.length+'</b><span>leads reviewed</span></div>'+
+   '<div class="stat"><b>'+pool.length+'</b><span>leads reviewed</span></div>'+
    '<div class="stat"><b>'+top+'</b><span>places to start</span></div>'+
    '<div class="stat"><b>'+week+'</b><span>posted in the last 7 days</span></div>'+
    '<div class="stat"><b>'+sent+'</b><span>sent so far</span></div>';
@@ -718,17 +866,18 @@ function renderList(){
     if(b.getAttribute("data-sort")===view.sort){b.setAttribute("aria-sort",view.dir==="asc"?"ascending":"descending");}else{b.removeAttribute("aria-sort");}
   });
   var ss=$("#sortSel");if(ss)ss.value=view.sort+":"+view.dir;
-  renderStats();
+  renderStats();renderCities();renderPicks();
 }
 function fillSelect(id,opts,val){
   $(id).innerHTML=opts.map(function(o){return '<option value="'+esc(o[0])+'">'+esc(o[1])+"</option>";}).join("");$(id).value=val;
 }
 function buildFilters(){
   fillSelect("#fTier",[["all","All priorities"],["top","Start here"],["strong","Strong"],["test","Worth a test"],["watch","Watch"]],view.tier);
-  var lanes=[];leads.forEach(function(l){if(lanes.indexOf(l.lane)<0)lanes.push(l.lane);});
+  var lanes=[];leads.filter(inCity).forEach(function(l){if(lanes.indexOf(l.lane)<0)lanes.push(l.lane);});
   fillSelect("#fLane",[["all","All types"]].concat(lanes.map(function(x){return [x,x];})),view.lane);
   fillSelect("#fSrc",[["all","Jobs and gigs"],["Jobs","Jobs"],["Gigs","Gigs"]],view.src);
   fillSelect("#fAge",[["all","Any date"],["7","Last 7 days"],["14","Last 14 days"],["old","Older than 14 days"]],view.age);
+  fillSelect("#fUpd",[["all","All leads"],["new","New in this update"]],view.upd);
   fillSelect("#fStatus",[["active","Not passed"],["all","Everything"]].concat(STATUSES.map(function(s){return [s[0],s[1]];})),view.status);
   fillSelect("#sortSel",[["fit:desc","Best fit first"],["posted:desc","Newest first"],["posted:asc","Oldest first"],["title:asc","Title A to Z"],["lane:asc","Type of business"],["status:asc","Status"]],view.sort+":"+view.dir);
 }
@@ -762,7 +911,7 @@ document.addEventListener("click",function(e){
     if(openIds[id]&&statusOf(id)==="new"){setStatus(id,"opened");var s=document.getElementById("st-"+id);if(s){s.value="opened";s.className="status-sel s-opened";}renderStats();}
   }else if(t.hasAttribute("data-jump")){
     id=t.getAttribute("data-jump");
-    view.q="";view.tier="all";view.lane="all";view.src="all";view.age="all";view.status="all";
+    view.q="";view.tier="all";view.lane="all";view.src="all";view.age="all";view.status="all";view.upd="all";
     buildFilters();$("#q").value="";openIds[id]=true;renderList();scrollToRow(id);
   }else if(t.hasAttribute("data-tab")){
     id=t.getAttribute("data-id");var name=t.getAttribute("data-tab");tabById[id]=name;
@@ -789,6 +938,13 @@ document.addEventListener("click",function(e){
     var k=t.getAttribute("data-sort");
     if(view.sort===k){view.dir=view.dir==="asc"?"desc":"asc";}else{view.sort=k;view.dir=(k==="fit"||k==="posted")?"desc":"asc";}
     renderList();
+  }else if(t.hasAttribute("data-city")){
+    view.city=t.getAttribute("data-city");sSet("phxTriage.city",view.city);picksAll=false;
+    var lanes2=[];leads.filter(inCity).forEach(function(l){if(lanes2.indexOf(l.lane)<0)lanes2.push(l.lane);});
+    if(view.lane!=="all"&&lanes2.indexOf(view.lane)<0)view.lane="all";
+    buildFilters();renderList();
+  }else if(t.id==="picksMore"){
+    picksAll=!picksAll;renderPicks();
   }else if(t.hasAttribute("data-size")&&t.closest(".seg")){
     setSize(t.getAttribute("data-size"));
   }
@@ -809,12 +965,12 @@ document.addEventListener("input",function(e){
 
 /* filters */
 $("#q").addEventListener("input",function(){view.q=this.value.trim();renderList();});
-[["#fTier","tier"],["#fLane","lane"],["#fSrc","src"],["#fAge","age"],["#fStatus","status"]].forEach(function(p){
+[["#fTier","tier"],["#fLane","lane"],["#fSrc","src"],["#fAge","age"],["#fStatus","status"],["#fUpd","upd"]].forEach(function(p){
   $(p[0]).addEventListener("change",function(){view[p[1]]=this.value;renderList();});
 });
 $("#sortSel").addEventListener("change",function(){var v=this.value.split(":");view.sort=v[0];view.dir=v[1];renderList();});
 $("#clearBtn").addEventListener("click",function(){
-  view.q="";view.tier="all";view.lane="all";view.src="all";view.age="all";view.status="active";
+  view.q="";view.tier="all";view.lane="all";view.src="all";view.age="all";view.status="active";view.upd="all";
   $("#q").value="";buildFilters();renderList();
 });
 
@@ -837,10 +993,10 @@ bindSetting("#f-name","name");bindSetting("#f-company","company");bindSetting("#
 /* export and reset */
 function csvCell(v){v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
 function buildCsv(){
-  var head=["Priority","Fit","Title","Area","Posted","Type of business","Board","Why it fits","Note","Status","My notes"];
+  var head=["City","Priority","Fit","Title","Area","Posted","Type of business","Board","Why it fits","Note","Status","My notes"];
   var rows=leads.slice().sort(cmp).map(function(l){
     var st=STATUSES.filter(function(s){return s[0]===statusOf(l.id);})[0][1];
-    return [TIERS[l.tier],l.fit,l.t,l.area,l.posted,l.lane,l.src,l.why,l.note,st,state.notes[l.id]||""].map(csvCell).join(",");
+    return [l.city,TIERS[l.tier],l.fit,l.t,l.area,l.posted,l.lane,l.src,l.why,l.note,st,state.notes[l.id]||""].map(csvCell).join(",");
   });
   return [head.join(",")].concat(rows).join("\r\n");
 }
